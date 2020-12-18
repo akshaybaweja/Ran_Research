@@ -1,0 +1,80 @@
+.top-nav .navbar-brand{
+  margin-left: 1rem;
+  font-size: 14px;
+  font-family:"Roboto";
+
+}
+
+.top-nav .navbar-nav{
+  font-size: 14px;
+  font-family:"Roboto";
+  margin-top:-0.12rem;
+  padding-top: 0rem;
+  padding-bottom: 0rem;
+}
+.top-nav .nav-item{
+  margin-right: 5rem;
+  margin-bottom: -.38rem;
+}
+
+.top-nav .nav-item .active{
+  border-bottom: 2.8px solid;
+}
+
+.top-nav .navbar {
+  padding: 0.5rem 1rem 0rem 1rem;
+  border-bottom: 3px solid #F0F0F0;
+  padding-bottom: 0rem;
+  height: 10vh;
+}
+
+.page {
+  display: table;
+  width: 100vw;
+}
+
+.page-content,
+.sidebar {
+  display: table-cell;
+}
+
+.page-content{
+  width:100vw;
+}
+.sidebar {
+  width:2000px;
+  height: 90vh;
+  padding-top: 4.8rem;
+  flex-direction: column;
+}
+
+.left-nav .group2 {
+  height: 400px;
+  padding-top: 100px;
+}
+
+
+/*
+.main{
+  display: table;
+  width:100%;
+}
+
+.main, .left-col {
+  display: table-cell;
+}
+
+.left-col {
+
+} */
+
+
+/* .navbar-nav .active a::after {
+  border-bottom: 5px solid #000000;
+  content: " ";
+  left: 0;
+  position: absolute;
+  right: 0;
+} */
+
+.box-shadow { box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05); }
