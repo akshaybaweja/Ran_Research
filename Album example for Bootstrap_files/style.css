@@ -1,8 +1,10 @@
-.top-nav .navbar-brand{
-  margin-left: 1rem;
-  font-size: 14px ;
-  font-weight:700;
-  font-family:"Roboto";
+/* Top Navbar Styling */
+.navbar-brand{
+  margin-left: 0rem;
+  font-family: "roboto";
+  font-size: 16px;
+  color: #3A3A3A !important;
+  font-weight: 700;
 
 }
 
@@ -19,7 +21,7 @@
 }
 .top-nav .nav-item{
   margin-right: 5rem;
-  margin-bottom: -1rem;
+  margin-bottom: -.6rem;
 }
 
 .top-nav .nav-item .active{
@@ -38,6 +40,42 @@
   padding-bottom: 0px;
 }
 
+/*Left Navbar Styling */
+
+.sidebar {
+  min-width:320px;
+  height: 91.5vh;
+  padding-top: 4.8rem;
+  padding-left: 0;
+  padding-right: 0;
+  flex-direction: column;
+}
+
+
+.left-nav .nav-link{
+  color: #9C9C9C;
+}
+
+.left-nav .nav-link .active{
+  color: #FFFFFF;
+}
+
+.left-nav .nav-item .active{
+  background-color: #3A3A3A;
+}
+
+.left-nav .navbar-expand{
+  border-bottom: none;
+  padding-right: 0;
+}
+
+.left-nav .nav-item{
+  width:100%;
+  margin:0;
+}
+
+/*Main Content Styling*/
+
 .page {
   display: table;
   width: 100vw;
@@ -51,12 +89,7 @@
 .page-content{
   width:100vw;
 }
-.sidebar {
-  min-width:320px;
-  height: 91.5vh;
-  padding-top: 4.8rem;
-  flex-direction: column;
-}
+
 
 .left-nav .group2 {
   height: 400px;
@@ -92,6 +125,7 @@ h3{
   font-size: 16px;
   color: #9C9C9C;
 }
+
 
 /*
 .main{
