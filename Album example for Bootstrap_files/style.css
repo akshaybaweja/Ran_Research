@@ -51,6 +51,22 @@
   flex-direction: column;
 }
 
+.left-nav .navbar-expand{
+  border-bottom: none;
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.left-nav .nav-item{
+  width:100%;
+  margin:0;
+  padding:0;
+}
+
+.left-nav .nav-item .active{
+  background-color: #3A3A3A;
+}
+
 
 .left-nav .nav-link{
   color: #9C9C9C;
@@ -60,19 +76,9 @@
   color: #FFFFFF;
 }
 
-.left-nav .nav-item .active{
-  background-color: #3A3A3A;
-}
 
-.left-nav .navbar-expand{
-  border-bottom: none;
-  padding-right: 0;
-}
 
-.left-nav .nav-item{
-  width:100%;
-  margin:0;
-}
+
 
 /*Main Content Styling*/
 
