@@ -157,6 +157,26 @@ h4{
   max-width: 9rem;
 }
 
+.row .touchgen{
+  min-height:8rem;
+}
+
+.touchgen-box{
+  border-radius: 1rem;
+  border: 1px solid #CACACA;
+  width: 13rem;
+  height:13rem;
+  padding:0rem 1.6rem;
+  margin-bottom: .8rem;
+  margin-top: 2rem;
+}
+
+.generator-logo{
+  margin: auto;
+}
+
+
+
 
 /*
 .main{
