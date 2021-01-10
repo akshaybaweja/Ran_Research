@@ -76,11 +76,21 @@
   color: #FFFFFF;
 }
 
+.left-nav .icon{
+  margin: -.1rem 1.2rem 0rem 20%;
+}
+
 
 
 
 
 /*Main Content Styling*/
+
+.group1{
+  ms-flex-wrap: nowrap!important;
+  flex-wrap: nowrap!important;
+  max-width: 87vw;
+}
 
 .page {
   display: table;
@@ -96,22 +106,32 @@
   width:100vw;
 }
 
-
-.left-nav .group2 {
-  height: 400px;
-  padding-top: 100px;
+.row .emotion{
+  min-height:10rem;
 }
 
-.emotion{
-  height:3rem;
-}
-
-.main-table .emotion{
+section .emotion-table{
   margin-top: 3rem;
+  margin-left: 1rem;
 }
+
+
+.row .emotion{
+  margin-bottom: 1rem;
+}
+
+.emotion-box{
+  border-radius: 1rem;
+  border: 1px solid #CACACA;
+  max-width: 9rem;
+  max-height:9rem;
+  padding:0rem 1.2rem;
+}
+
+
 
 .main-content{
-  max-width: 60vw;
+  max-width: 75vw;
   padding: 1rem 4rem;
 }
 
@@ -120,16 +140,23 @@
 }
 
 h2 {
-  font-family: "Roboto";
-  font-size:30px;
-  font-weight: 500;
-  line-height: 3.8rem;
+  font-family: "Roboto" !important;
+  font-size:30px !important;
+  font-weight: 500 !important;
+  line-height: 3.8rem !important;
 }
 
 h3{
-  font-family: "Roboto";
-  font-size: 16px;
-  color: #9C9C9C;
+  font-family: "Roboto" !important;
+  font-size: 18px !important;
+  font-weight: 400 !important;
+}
+
+h4{
+  font-family: "Roboto" !important;
+  font-size: 18px !important;
+  font-weight: 400 !important;
+  margin:1rem;
 }
 
 
