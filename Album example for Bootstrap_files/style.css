@@ -97,6 +97,24 @@
   border: 1px solid #CACACA;
 }
 
+.sidebar-tactor{
+  width: 4.5rem;
+  margin-bottom: 0rem;
+}
+
+.sidebar-tactor-box h4{
+  margin:0rem;
+}
+
+.sidebar-tactor-box{
+  padding:.6rem 4.2rem;
+  margin-left: 3.8rem;
+  margin-bottom: .8rem;
+  margin-top: .3rem;
+  border-radius: 1rem;
+  border: 1px solid #CACACA;
+}
+
 
 
 
@@ -141,6 +159,148 @@ section .emotion-table{
   margin-top: 2rem;
 }
 
+.dashboard-box{
+  border-radius: 1rem;
+  border: 1px solid #CACACA;
+  padding:0rem 1rem 2rem 1rem;
+  margin-bottom: .8rem;
+  margin-top: 2rem;
+}
+
+.slider-value, .slider-label{
+  display: inline-block;
+  font-weight:400;
+  font-family: Roboto;
+  font-size: 14px;
+  margin-bottom: 0rem;
+}
+
+.slider-label{
+  margin-left:1.8rem;
+}
+
+.slider-icon{
+  margin-top:-0.5rem;
+  margin-right:0.4rem;
+  width:5%;
+}
+
+.slider-value{
+  margin-right: 1.2rem;
+}
+
+.graph{
+  height:12rem;
+}
+
+
+.pp img{
+    display: inline-block;
+    margin-right: 1rem;
+}
+
+.name-label{
+  display:inline-block !important;
+  display: inline-block;
+font-weight: 400;
+font-family: Roboto;
+font-size: 14px;
+margin-bottom: 0rem;
+}
+
+.text-input{
+  border: 1px solid #3A3A3A;
+  border-radius: 5px;
+  margin-left: 1rem;
+}
+
+.name-input{
+  margin-top: 2rem;
+}
+
+.archive{
+  display:inline-block;
+  border:none !important;
+  background: none !important;
+}
+
+.archive img{
+  margin-left: .3rem;
+}
+
+.buttons button{
+  border: 1px solid #3A3A3A;
+border-radius: 20px;
+width: 6rem;
+margin: .3rem;
+}
+
+.buttons{
+  margin-top:3rem;
+}
+
+#export{
+  background: #FFFFFF;
+  text-transform: uppercase;
+}
+
+#save{
+  background: #3A3A3A;
+  color: #FFFFFF;
+  text-transform: uppercase;
+}
+
+input[type=range] {
+  -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
+  width: 100%; /* Specific width is required for Firefox. */
+  background: transparent; /* Otherwise white in Chrome */
+}
+
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+}
+
+input[type=range]:focus {
+  outline: none; /* Removes the blue border. You should probably do some kind of focus styling for accessibility reasons though. */
+}
+
+input[type=range]::-ms-track {
+  cursor: pointer;
+
+  /* Hides the slider so custom styles can be added */
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+
+.slider{
+  width: 88% !important;
+  margin-right:0rem;
+  background: rgb(131,58,180);
+ background: linear-gradient(90deg, rgba(255,255,255,1) 15%, rgba(156,156,156,1) 15%, rgba(156,156,156,1) 63%, rgba(255,255,255,1) 63%) !important;
+  border: 1px solid #9C9C9C;
+border-radius: 10px;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 5px;
+  height:15px;
+  background: #3A3A3A;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  background: #4CAF50;
+  cursor: pointer;
+}
+
+.slider-div{
+  margin-top:1rem;
+}
 
 
 .main-content{
