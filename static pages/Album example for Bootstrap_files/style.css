@@ -410,18 +410,62 @@ h5{
   margin-top: 2rem;
 }
 
-.row .tactorinfo{
-  min-height:25rem;
-}
 
-.tactorinfo-box{
+.tactortop-box{
   border-radius: 1rem;
-  border: 1px solid #CACACA;
-  width: 30rem;
-  height:13rem;
-  padding:0rem 1.6rem;
+  width: 20rem;
+  height:12rem;
+  padding:0rem 2rem;
   margin-bottom: .8rem;
   margin-top: 2rem;
+}
+
+.tactoroverview{
+  font-weight:700;
+}
+.tactorside-box{
+  border-radius: 1rem;
+  width: 20rem;
+  height:10rem;
+  padding:0rem 2rem;
+  margin-bottom: .8rem;
+  margin-top: 2rem;
+}
+
+.tactorplacement-box{
+  border-radius: 1rem;
+  width: 20rem;
+  height:24.9rem;
+  padding:0rem 2rem;
+  margin-bottom: .8rem;
+  margin-top: 2rem;
+}
+
+.row.tactor-emotion{
+  padding: 1.2rem;
+  width: 100%;
+  margin:auto;
+}
+
+img.tactor-emotion{
+  margin-bottom:.1rem;
+  margin-right:.3rem;
+  margin-left: .3rem;
+}
+
+h4.tactor-emotion{
+  margin-top: 0rem;
+  margin-bottom: 1rem;
+}
+
+h4.activated{
+  margin:1rem 2rem;
+  max-width: none !important;
+}
+
+div.buttons{
+  margin-right:6rem!important;
+  margin-left: 3rem!important;
 }
 
 .generator-logo{
