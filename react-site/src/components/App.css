@@ -1,6 +1,6 @@
 /* Top Navbar Styling */
 .navbar-brand{
-  margin-left: 0rem;
+  margin-left: 2rem;
   font-family: "roboto";
   font-size: 16px;
   color: #3A3A3A !important;
@@ -25,7 +25,7 @@
 }
 
 .top-nav.nav-link{
-    margin-bottom:0.5rem !important;
+    margin-bottom:0.1rem !important;
 }
 
 .top-nav .nav-item .active{
@@ -48,7 +48,7 @@
 
 .sidebar {
   min-width:320px;
-  height: 91.5vh;
+  height: 93.5vh;
   padding-top: 4.8rem;
   padding-left: 0;
   padding-right: 0;
@@ -99,7 +99,7 @@
   margin-right:0;
 }
 
-.tactinfo.col{
+.col.tactinfo{
   padding-left:0;
   padding-top:.5rem;
 }
@@ -324,6 +324,13 @@ margin: .3rem;
   text-transform: uppercase;
 }
 
+#activated{
+  background: #3A3A3A;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  padding: .5rem 6rem .5rem 1rem !important;
+}
+
 input[type=range] {
   -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
   width: 100%; /* Specific width is required for Firefox. */
@@ -477,3 +484,109 @@ h6{
 } */
 
 .box-shadow { box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05); }
+
+
+.row .touchgen{
+  min-height:8rem;
+}
+
+.touchgen-box{
+  border-radius: 1rem;
+  border: 1px solid #CACACA;
+  width: 13rem;
+  height:13rem;
+  padding:0rem 1.6rem;
+  margin-bottom: .8rem;
+  margin-top: 2rem;
+}
+
+
+.tactortop-box{
+  border-radius: 1rem;
+  width: 20rem;
+  height:12rem;
+  padding:0rem 2rem;
+  margin-bottom: .8rem;
+  margin-top: 2rem;
+}
+
+.tactoroverview{
+  font-weight:700;
+}
+.tactorside-box{
+  border-radius: 1rem;
+  width: 20rem;
+  height:10rem;
+  padding:0rem 2rem;
+  margin-bottom: .8rem;
+  margin-top: 2rem;
+}
+
+.tactorplacement-box{
+  border-radius: 1rem;
+  width: 20rem;
+  height:24.9rem;
+  padding:0rem 2rem;
+  margin-bottom: .8rem;
+  margin-top: 2rem;
+}
+
+.row.tactor-emotion{
+  padding: 1.2rem;
+  width: 100%;
+  margin:auto;
+}
+
+img.tactor-emotion{
+  margin-bottom:.1rem;
+  margin-right:.3rem;
+  margin-left: .3rem;
+}
+
+h4.tactor-emotion{
+  margin-top: 0rem;
+  margin-bottom: 1rem;
+  margin-left: auto;
+width: 70px;
+margin-right: auto;
+}
+
+h4.activated{
+  margin:1rem 2rem;
+  max-width: none !important;
+}
+
+div.buttons{
+  margin-right:6rem!important;
+  margin-left: 3rem!important;
+}
+
+.generator-logo{
+  margin: auto;
+}
+
+.row.left-nav{
+  margin-left:-30px !important;
+}
+
+ul.left-nav.tinfo{
+  margin-left:-20px !important;
+}
+
+.sidebar.tinfo{
+  padding-top:4rem !important;
+}
+
+
+img.tactortop, img.tactorside, img.tactorplacement{
+  width:100%;
+}
+
+h6.activated{
+  margin:auto !important;
+
+}
+
+.tactselected{
+  max-width:220px !important;
+}

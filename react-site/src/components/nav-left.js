@@ -1,4 +1,4 @@
-import React from 'react';
+ import React from 'react';
 import './App.css';
 import emotion from "./Icons/Small Icons/mood-24px-grey.svg";
 import tactor from "./Icons/Small Icons/tactor-grey.svg";
@@ -29,8 +29,44 @@ import irand from "./Icons/Small Icons/interval_randomness.svg";
 import play from "./Icons/play-filled.svg";
 import pause from "./Icons/pause-filled.svg";
 import arrow from "./Icons/Small Icons/arrow.svg";
+import hitw from "./Icons/Tactor_white/Gesture_white_Hit.svg";
+import patw from "./Icons/Tactor_white/Gesture_white_Pat-14.svg";
+import pushw from "./Icons/Tactor_white/Gesture_white_Push-21.svg";
+import rubw from "./Icons/Tactor_white/Gesture_white_Rub-18.svg";
+import shakew from "./Icons/Tactor_white/Gesture_white_Shake.svg";
+import squeezew from "./Icons/Tactor_white/Gesture_white_Squeeze-15.svg";
+import strokew from "./Icons/Tactor_white/Gesture_white_Stroke.svg";
+import tapw from "./Icons/Tactor_white/Gesture_white_Tap-17.svg";
+import link from "./Icons/link.svg"
+import patup from "./Icons/Tactor Image/Pat/yellow_pat_up.png";
+import patcut from "./Icons/Tactor Image/Pat/yellow_pat_cut.png";
+import pushup from "./Icons/Tactor Image/Push/yellow_push_up.png";
+import pushcut from "./Icons/Tactor Image/Push/yellow_push_cut.png";
+import rubup from "./Icons/Tactor Image/Rub/yellow_rub_up.png";
+import rubcut from "./Icons/Tactor Image/Rub/yellow_rub_cut.png";
+import shakeup from "./Icons/Tactor Image/Shake/yellow_shake_up.png";
+import shakecut from "./Icons/Tactor Image/Shake/yellow_shake_cut.png";
+import squeezeup from "./Icons/Tactor Image/Squeeze/yellow_squeeze_up.png";
+import squeezecut from "./Icons/Tactor Image/Squeeze/yellow_squeeze_cut.png";
+import strokeup from "./Icons/Tactor Image/Stroke/yellow_stroke_up.png";
+import strokecut from "./Icons/Tactor Image/Stroke/yellow_stroke_cut.png";
+import tapup from "./Icons/Tactor Image/Tap/yellow_tap_up.png";
+import tapcut from "./Icons/Tactor Image/Tap/yellow_tap_cut.png";
+import hitplace from "./Icons/Placement Image/Hit_placement-12.png";
+import patplace from "./Icons/Placement Image/Pat_placement-13.png";
+import pushplace from "./Icons/Placement Image/Push_placement-14.png";
+import rubplace from "./Icons/Placement Image/Rub_placement-15.png";
+import shakeplace from "./Icons/Placement Image/Shake_placement-16.png";
+import squeezeplace from "./Icons/Placement Image/Squeeze_placement-17.png";
+import strokeplace from "./Icons/Placement Image/Stroke_placement-18.png";
+import tapplace from "./Icons/Placement Image/Tap_placement-19.png";
+
+
 import Emotion from './emotion';
 import Sketch from 'react-p5';
+
+// const SerialPort = require('serialport');
+// const port = new SerialPort('/dev/tty-usbserial1');
 
 //TO DO: Add the emotion and placeholders to the left bar.
 //Allow users to go home with the top navigation
@@ -38,6 +74,7 @@ import Sketch from 'react-p5';
 //Add graph and sliders
 //Add serial library
 //Add Archive
+
 
 
 class LeftNav extends React.Component{
@@ -49,6 +86,9 @@ x =0;
 timer;
 from = false;
 volhistory = [];
+port = null;
+serialmsg = [0, 12, 12, 90, 25, 150, 0, 50, 0];
+
 
 
 constructor(props) {
@@ -67,12 +107,12 @@ constructor(props) {
     tselected:false,
     ticon: null,
     tname: null,
-    trange:[],
-    tspeed:[],
-    rspeed:[],
-    randomness:[],
-    tint:[],
-    irand:[],
+    trange:[90,0,0],
+    tspeed:[180,0,0],
+    rspeed:[180,0,0],
+    randomness:[25,0,0],
+    tint:[500,0,0],
+    irand:[150,0,0],
     shake: null,
     squeeze: null,
     hit: null,
@@ -81,13 +121,89 @@ constructor(props) {
     rub: null,
     stroke: null,
     tap: null,
+    port:null,
+    generator:[true,"active"],
+    tinfo:[false, null],
+    archive:[false,null],
+    shake1:[false,null,false,"Tactor 5", "Pin 5"], //selected, "active", activated
+    squeeze1:[false,null,false, "Tactor 6", "Pin 6"],
+    hit1:[true, "active",false, "Tactor 1", "Pin 2"],
+    pat1:[false,null,false, "Tactor 2", "Pin 2"],
+    push1:[false,null,false, "Tactor 3", "Pin 3"],
+    rub1: [false,null,false, "Tactor 4", "Pin 4"],
+    stroke1: [false,null,false, "Tactor 7", "Pin 7"],
+    tap1: [false,null,false, "Tactor 8", "Pin 8"],
+    place:hitplace,
+    cut:patcut,
+    up:patup,
+    acttact:[hit, "Tactor 1", "Pin 2", "Hit"],
+    happiness:null,
+    fear:null,
+    sympathy:null,
+    sadness:null,
+    anger: null,
+    disgust: null,
+    love: null,
+    gratitude: null,
   };
 }
 
+async write(port, slider){
+  const writer = port.writable.getWriter();
+  //const toWrite = new TextEncoder().encode("h");
+  //parseInt(slider);
+  var data = new Uint8Array(9);
+  for(var i=0;i<slider.length;i++){
+  data[i] = parseInt(slider[i]);
+}
+  //
+
+  // console.log(port.writable);
+  await writer.write(data);
+  console.log(data);
+//
+//   const textEncoder = new TextEncoder();
+// const writableStreamClosed = textEncoder.readable.pipeTo(port.writable);
+//
+// const writer = textEncoder.writable.getWriter();
+
+// await writer.write("hello");
+writer.releaseLock();
+};
+
+async start(data) {
+  if (this.state.port==null){
+  alert("This app is requesting to use your serial port, are you alright with this action?")
+  this.port =  await navigator.serial.requestPort();
+  const ports = await navigator.serial.getPorts();
+
+  if(this.port.readable===null){
+  await this.port.open({ baudRate: 9600 });
+}
+  console.log(this.port);
+  console.log(ports);
+  this.setState({port:true,});
+
+  }
+  console.log(this.state.port);
+  this.write(this.port, data);
+};
+
+
+
 handleClick(name) {
+  var hitstate=this.state.hit1;
+  var patstate=this.state.pat1;
+  var pushstate=this.state.push1;
+  var rubstate=this.state.rub1;
+  var shakestate=this.state.shake1;
+  var squeezestate=this.state.squeeze1;
+  var strokestate=this.state.stroke1;
+  var tapstate=this.state.tap1;
   switch (name) {
     case "emotion":
       this.setState({ home: false, emotion:true, estate:"active", tactor: false, tstate:null, behavior: false, bstate:null});
+      //alert(localStorage.getItem('test'));
       break;
     case "tactor":
       this.setState({home: false, emotion: false, estate:null, tactor: true, tstate:"active", behavior: false, bstate: null});
@@ -112,7 +228,228 @@ handleClick(name) {
     case "behavior":
     this.setState({home: false, emotion: false, estate:null, tactor: false, tstate:null, behavior: true, bstate:"active"});
       break;
+    case "tbots":
+    this.setState({home:true, emotion: false,  tactor:false, behavior:false});
+    break;
+    case "tgen":
+    this.setState({generator:[true,"active"], tinfo:[false,null], archive:[false,null]});
+    break;
+    case "tinfo":
+    this.setState({generator:[false,null], tinfo:[true,"active"], archive:[false,null]});
+    break;
+    case "archive":
+    this.setState({generator:[false,null], tinfo:[false,null], archive:[true,"active"]});
+    alert("Archive is not yet an active feature. Stay Tuned!");
+    break;
+    case "hit":
+    if(hitstate[2]){
+      if(this.state.eselected){
+
+        this.setState({home: false, emotion: false, estate:null, tactor: false, tstate:null, behavior: true, bstate:"active"});
+      }else{
+
+        this.setState({ home: false, emotion:true, estate:"active", tactor: false, tstate:null, behavior: false, bstate:null});
+      }
+      break;
+    }else{
+      alert("You need to activate this tactor before continuing.");
+
+      this.setState({generator:[false,null], tinfo:[true,"active"], archive:[false,null]});
+      this.setState({place:hitplace,cut:patcut,up:patup,acttact:[hit,hitstate[3],hitstate[4], "Hit"],hit1:[true,"active",hitstate[2],hitstate[3],hitstate[4]], pat1:[false,null,patstate[2],patstate[3],patstate[4]], push1:[false,null,pushstate[2],pushstate[3],pushstate[4]], rub1:[false,null,rubstate[2],rubstate[3],rubstate[4]],shake1:[false,null,shakestate[2],shakestate[3],shakestate[4]],squeeze1:[false,null,squeezestate[2],squeezestate[3],squeezestate[4]],stroke1:[false,null,strokestate[2],strokestate[3],strokestate[4]],tap1:[false,null,tapstate[2],tapstate[3],tapstate[4]],});
+
+    }
+    break;
+    case "pat":
+    if(patstate[2]){
+      if(this.state.eselected){
+
+        this.setState({home: false, emotion: false, estate:null, tactor: false, tstate:null, behavior: true, bstate:"active"});
+      }else{
+
+        this.setState({ home: false, emotion:true, estate:"active", tactor: false, tstate:null, behavior: false, bstate:null});
+      }
+      break;
+    }else{
+      alert("You need to activate this tactor before continuing.");
+
+      this.setState({generator:[false,null], tinfo:[true,"active"], archive:[false,null]});
+      this.setState({place:patplace,cut:patcut,up:patup,acttact:[pat,patstate[3],patstate[4], "Pat"],hit1:[false,null,hitstate[2],hitstate[3],hitstate[4]], pat1:[true,"active",patstate[2],patstate[3],patstate[4]], push1:[false,null,pushstate[2],pushstate[3], pushstate[4]], rub1:[false,null,rubstate[2],rubstate[3],rubstate[4]],shake1:[false,null,shakestate[2],shakestate[3],shakestate[4]],squeeze1:[false,null,squeezestate[2],squeezestate[3],squeezestate[4]],stroke1:[false,null,strokestate[2],strokestate[3],strokestate[4]],tap1:[false,null,tapstate[2],tapstate[3],tapstate[4]],});
+    }
+    break;
+    case "push":
+    if(pushstate[2]){
+      if(this.state.eselected){
+
+        this.setState({home: false, emotion: false, estate:null, tactor: false, tstate:null, behavior: true, bstate:"active"});
+      }else{
+
+        this.setState({ home: false, emotion:true, estate:"active", tactor: false, tstate:null, behavior: false, bstate:null});
+      }
+      break;
+    }else{
+      alert("You need to activate this tactor before continuing.");
+
+      this.setState({generator:[false,null], tinfo:[true,"active"], archive:[false,null]});
+      this.setState({place:pushplace,cut:pushcut,up:pushup,acttact:[push,pushstate[3],pushstate[4], "Push"],hit1:[false,null,hitstate[2],hitstate[3],hitstate[4]], pat1:[false,null,patstate[2],patstate[3],patstate[4]], push1:[true,"active",pushstate[2],pushstate[3],pushstate[4]], rub1:[false,null,rubstate[2],rubstate[3],rubstate[4]],shake1:[false,null,shakestate[2],shakestate[3],shakestate[4]],squeeze1:[false,null,squeezestate[2],squeezestate[3],squeezestate[4]],stroke1:[false,null,strokestate[2],strokestate[3],strokestate[4]],tap1:[false,null,tapstate[2],tapstate[3],tapstate[4]],});
+
+    }
+    break;
+    case "rub":
+    if(rubstate[2]){
+      if(this.state.eselected){
+
+        this.setState({home: false, emotion: false, estate:null, tactor: false, tstate:null, behavior: true, bstate:"active"});
+      }else{
+
+        this.setState({ home: false, emotion:true, estate:"active", tactor: false, tstate:null, behavior: false, bstate:null});
+      }
+      break;
+    }else{
+      alert("You need to activate this tactor before continuing.");
+
+      this.setState({generator:[false,null], tinfo:[true,"active"], archive:[false,null]});
+      this.setState({place:rubplace,cut:rubcut,up:rubup,acttact:[rub,rubstate[3],rubstate[4], "Rub"],hit1:[false,null,hitstate[2],hitstate[3],hitstate[4]], pat1:[false,null,patstate[2],patstate[3],patstate[4]], push1:[false,null,pushstate[2],pushstate[3],pushstate[4]], rub1:[true,"active",rubstate[2],rubstate[3],rubstate[4]],shake1:[false,null,shakestate[2],shakestate[3],shakestate[4]],squeeze1:[false,null,squeezestate[2],squeezestate[3],squeezestate[4]],stroke1:[false,null,strokestate[2],strokestate[3],strokestate[4]],tap1:[false,null,tapstate[2],tapstate[3],tapstate[4]],});
+
+    }
+
+    break;
+    case "shake":
+    if(shakestate[2]){
+      if(this.state.eselected){
+
+        this.setState({home: false, emotion: false, estate:null, tactor: false, tstate:null, behavior: true, bstate:"active"});
+      }else{
+
+        this.setState({ home: false, emotion:true, estate:"active", tactor: false, tstate:null, behavior: false, bstate:null});
+      }
+      break;
+    }else{
+      alert("You need to activate this tactor before continuing.");
+
+      this.setState({generator:[false,null], tinfo:[true,"active"], archive:[false,null]});
+      this.setState({place:shakeplace,cut:shakecut,up:shakeup,acttact:[shake,shakestate[3],shakestate[4], "Shake"],hit1:[false,null,hitstate[2],hitstate[3],hitstate[4]], pat1:[false,null,patstate[2],patstate[3],patstate[4]], push1:[false,null,shakestate[2],shakestate[3],shakestate[4]], rub1:[false,null,rubstate[2],rubstate[3],rubstate[4]],shake1:[true,"active",shakestate[2],shakestate[3],shakestate[4]],squeeze1:[false,null,squeezestate[2],squeezestate[3],squeezestate[4]],stroke1:[false,null,strokestate[2],strokestate[3],strokestate[4]],tap1:[false,null,tapstate[2],tapstate[3],tapstate[4]],});
+
+    }
+
+    break;
+    case "squeeze":
+    if(squeezestate[2]){
+      if(this.state.eselected){
+
+        this.setState({home: false, emotion: false, estate:null, tactor: false, tstate:null, behavior: true, bstate:"active"});
+      }else{
+
+        this.setState({ home: false, emotion:true, estate:"active", tactor: false, tstate:null, behavior: false, bstate:null});
+      }
+      break;
+    }else{
+      alert("You need to activate this tactor before continuing.");
+      this.setState({generator:[false,null], tinfo:[true,"active"], archive:[false,null]});
+      this.setState({place:squeezeplace,cut:squeezecut,up:squeezeup,acttact:[squeeze,squeezestate[3],squeezestate[4], "Squeeze"],hit1:[false,null,hitstate[2],hitstate[3],hitstate[4]], pat1:[false,null,patstate[2],patstate[3],patstate[4]], push1:[false,null,pushstate[2],pushstate[3],pushstate[4]], rub1:[false,null,rubstate[2],rubstate[3],rubstate[4]],shake1:[false,null,shakestate[2],shakestate[3],shakestate[4]],squeeze1:[true,"active",squeezestate[2],squeezestate[3],squeezestate[4]],stroke1:[false,null,strokestate[2],strokestate[3],strokestate[4]],tap1:[false,null,tapstate[2],tapstate[3],tapstate[4]],});
+
+    }
+
+    break;
+    case "stroke":
+    if(strokestate[2]){
+      if(this.state.eselected){
+
+        this.setState({home: false, emotion: false, estate:null, tactor: false, tstate:null, behavior: true, bstate:"active"});
+      }else{
+
+        this.setState({ home: false, emotion:true, estate:"active", tactor: false, tstate:null, behavior: false, bstate:null});
+      }
+      break;
+    }else{
+      alert("You need to activate this tactor before continuing.");
+      this.setState({generator:[false,null], tinfo:[true,"active"], archive:[false,null]});
+      this.setState({place:strokeplace,cut:strokecut,up:strokeup,acttact:[stroke,strokestate[3],strokestate[4], "Stroke"],hit1:[false,null,hitstate[2],hitstate[3],hitstate[4]], pat1:[false,null,patstate[2],patstate[3],patstate[4]], push1:[false,null,pushstate[2],pushstate[3],pushstate[4]], rub1:[false,null,rubstate[2],rubstate[3],rubstate[4]],shake1:[false,null,shakestate[2],shakestate[3],shakestate[4]],squeeze1:[false,null,squeezestate[2],squeezestate[3],squeezestate[4]],stroke1:[true,"active",strokestate[2],strokestate[3],strokestate[4]],tap1:[false,null,tapstate[2],tapstate[3],tapstate[4]],});
+
+    }
+
+    break;
+    case "tap":
+    if(tapstate[2]){
+      if(this.state.eselected){
+
+        this.setState({home: false, emotion: false, estate:null, tactor: false, tstate:null, behavior: true, bstate:"active"});
+      }else{
+
+        this.setState({ home: false, emotion:true, estate:"active", tactor: false, tstate:null, behavior: false, bstate:null});
+      }
+      break;
+    }else{
+      alert("You need to activate this tactor before continuing.");
+      this.setState({generator:[false,null], tinfo:[true,"active"], archive:[false,null]});
+      this.setState({place:tapplace,cut:tapcut,up:tapup,acttact:[tap,tapstate[3],tapstate[4],"Tap"],hit1:[false,null,hitstate[2],hitstate[3],hitstate[4]], pat1:[false,null,patstate[2],patstate[3],patstate[4]], push1:[false,null,pushstate[2],pushstate[3],pushstate[4]], rub1:[false,null,rubstate[2],rubstate[3],rubstate[4]],shake1:[false,null,shakestate[2],shakestate[3],shakestate[4]],squeeze1:[false,null,squeezestate[2],squeezestate[3],squeezestate[4]],stroke1:[false,null,strokestate[2],strokestate[3],strokestate[4]],tap1:[true,"active",tapstate[2],tapstate[3],tapstate[4]],});
+
+    }
+
+    break;
+    case "hit1":
+    this.setState({place:hitplace,cut:patcut,up:patup,acttact:[hit,hitstate[3],hitstate[4], "Hit"],hit1:[true,"active",hitstate[2],hitstate[3],hitstate[4]], pat1:[false,null,patstate[2],patstate[3],patstate[4]], push1:[false,null,pushstate[2],pushstate[3],pushstate[4]], rub1:[false,null,rubstate[2],rubstate[3],rubstate[4]],shake1:[false,null,shakestate[2],shakestate[3],shakestate[4]],squeeze1:[false,null,squeezestate[2],squeezestate[3],squeezestate[4]],stroke1:[false,null,strokestate[2],strokestate[3],strokestate[4]],tap1:[false,null,tapstate[2],tapstate[3],tapstate[4]],});
+    break;
+    case "pat1":
+    this.setState({place:patplace,cut:patcut,up:patup,acttact:[pat,patstate[3],patstate[4], "Pat"],hit1:[false,null,hitstate[2],hitstate[3],hitstate[4]], pat1:[true,"active",patstate[2],patstate[3],patstate[4]], push1:[false,null,pushstate[2],pushstate[3], pushstate[4]], rub1:[false,null,rubstate[2],rubstate[3],rubstate[4]],shake1:[false,null,shakestate[2],shakestate[3],shakestate[4]],squeeze1:[false,null,squeezestate[2],squeezestate[3],squeezestate[4]],stroke1:[false,null,strokestate[2],strokestate[3],strokestate[4]],tap1:[false,null,tapstate[2],tapstate[3],tapstate[4]],});
+    break;
+    case "push1":
+    this.setState({place:pushplace,cut:pushcut,up:pushup,acttact:[push,pushstate[3],pushstate[4], "Push"],hit1:[false,null,hitstate[2],hitstate[3],hitstate[4]], pat1:[false,null,patstate[2],patstate[3],patstate[4]], push1:[true,"active",pushstate[2],pushstate[3],pushstate[4]], rub1:[false,null,rubstate[2],rubstate[3],rubstate[4]],shake1:[false,null,shakestate[2],shakestate[3],shakestate[4]],squeeze1:[false,null,squeezestate[2],squeezestate[3],squeezestate[4]],stroke1:[false,null,strokestate[2],strokestate[3],strokestate[4]],tap1:[false,null,tapstate[2],tapstate[3],tapstate[4]],});
+    break;
+    case "rub1":
+    this.setState({place:rubplace,cut:rubcut,up:rubup,acttact:[rub,rubstate[3],rubstate[4], "Rub"],hit1:[false,null,hitstate[2],hitstate[3],hitstate[4]], pat1:[false,null,patstate[2],patstate[3],patstate[4]], push1:[false,null,pushstate[2],pushstate[3],pushstate[4]], rub1:[true,"active",rubstate[2],rubstate[3],rubstate[4]],shake1:[false,null,shakestate[2],shakestate[3],shakestate[4]],squeeze1:[false,null,squeezestate[2],squeezestate[3],squeezestate[4]],stroke1:[false,null,strokestate[2],strokestate[3],strokestate[4]],tap1:[false,null,tapstate[2],tapstate[3],tapstate[4]],});
+    break;
+    case "shake1":
+    this.setState({place:shakeplace,cut:shakecut,up:shakeup,acttact:[shake,shakestate[3],shakestate[4], "Shake"],hit1:[false,null,hitstate[2],hitstate[3],hitstate[4]], pat1:[false,null,patstate[2],patstate[3],patstate[4]], push1:[false,null,shakestate[2],shakestate[3],shakestate[4]], rub1:[false,null,rubstate[2],rubstate[3],rubstate[4]],shake1:[true,"active",shakestate[2],shakestate[3],shakestate[4]],squeeze1:[false,null,squeezestate[2],squeezestate[3],squeezestate[4]],stroke1:[false,null,strokestate[2],strokestate[3],strokestate[4]],tap1:[false,null,tapstate[2],tapstate[3],tapstate[4]],});
+    break;
+    case "squeeze1":
+    this.setState({place:squeezeplace,cut:squeezecut,up:squeezeup,acttact:[squeeze,squeezestate[3],squeezestate[4], "Squeeze"],hit1:[false,null,hitstate[2],hitstate[3],hitstate[4]], pat1:[false,null,patstate[2],patstate[3],patstate[4]], push1:[false,null,pushstate[2],pushstate[3],pushstate[4]], rub1:[false,null,rubstate[2],rubstate[3],rubstate[4]],shake1:[false,null,shakestate[2],shakestate[3],shakestate[4]],squeeze1:[true,"active",squeezestate[2],squeezestate[3],squeezestate[4]],stroke1:[false,null,strokestate[2],strokestate[3],strokestate[4]],tap1:[false,null,tapstate[2],tapstate[3],tapstate[4]],});
+    break;
+    case "stroke1":
+    this.setState({place:strokeplace,cut:strokecut,up:strokeup,acttact:[stroke,strokestate[3],strokestate[4], "Stroke"],hit1:[false,null,hitstate[2],hitstate[3],hitstate[4]], pat1:[false,null,patstate[2],patstate[3],patstate[4]], push1:[false,null,pushstate[2],pushstate[3],pushstate[4]], rub1:[false,null,rubstate[2],rubstate[3],rubstate[4]],shake1:[false,null,shakestate[2],shakestate[3],shakestate[4]],squeeze1:[false,null,squeezestate[2],squeezestate[3],squeezestate[4]],stroke1:[true,"active",strokestate[2],strokestate[3],strokestate[4]],tap1:[false,null,tapstate[2],tapstate[3],tapstate[4]],});
+    break;
+    case "tap1":
+    this.setState({place:tapplace,cut:tapcut,up:tapup,acttact:[tap,tapstate[3],tapstate[4],"Tap"],hit1:[false,null,hitstate[2],hitstate[3],hitstate[4]], pat1:[false,null,patstate[2],patstate[3],patstate[4]], push1:[false,null,pushstate[2],pushstate[3],pushstate[4]], rub1:[false,null,rubstate[2],rubstate[3],rubstate[4]],shake1:[false,null,shakestate[2],shakestate[3],shakestate[4]],squeeze1:[false,null,squeezestate[2],squeezestate[3],squeezestate[4]],stroke1:[false,null,strokestate[2],strokestate[3],strokestate[4]],tap1:[true,"active",tapstate[2],tapstate[3],tapstate[4]],});
+    break;
   }
+}
+
+
+activate(name){
+  var hitstate=this.state.hit1;
+  var patstate=this.state.pat1;
+  var pushstate=this.state.push1;
+  var rubstate=this.state.rub1;
+  var shakestate=this.state.shake1;
+  var squeezestate=this.state.squeeze1;
+  var strokestate=this.state.stroke1;
+  var tapstate=this.state.tap1;
+  switch(name){
+  case "Hit":
+  this.setState({hit1:[hitstate[0],hitstate[1],true,hitstate[3],hitstate[4]]});
+  break;
+  case "Pat":
+  this.setState({pat1:[patstate[0],patstate[1],true,patstate[3],patstate[4]]});
+  break;
+  case "Push":
+  this.setState({push1:[pushstate[0],pushstate[1],true,pushstate[3],pushstate[4]]});
+  break;
+  case "Rub":
+  this.setState({rub1:[rubstate[0],rubstate[1],true,rubstate[3],rubstate[4]]});
+  break;
+  case "Shake":
+  this.setState({shake1:[shakestate[0],shakestate[1],true,shakestate[3],shakestate[4]]});
+  break;
+  case "Squeeze":
+  this.setState({squeeze1:[squeezestate[0],squeezestate[1],true,squeezestate[3],squeezestate[4]]});
+  break;
+  case "Stroke":
+  this.setState({stroke1:[strokestate[0],strokestate[1],true,strokestate[3],strokestate[4]]});
+  break;
+  case "Tap":
+  this.setState({tap1:[tapstate[0],tapstate[1],true,tapstate[3],tapstate[4]]});
+  break;
+}
+alert(name + " was activated!")
 }
 
 emotionSelect(name){
@@ -191,7 +528,8 @@ var irr = 100/(ir[1]-ir[0]);
 
   switch (name.toLowerCase()) {
     case "shake":
-      this.setState({ticon:shake, tname: "Shake"});
+    this.serialmsg[0]=5;
+      this.setState({ticon:shake, tname: "Shake" ,happiness:"suggested", fear:null,sympathy:"suggested",sadness:"suggested",anger: null,disgust: null,love: "suggested",gratitude:"suggested",});
       if(ename!=null){
       if (ename.toLowerCase() === "gratitude") {
           this.setState({trange:[40,20*trr,50*trr], tspeed:[125,90*tsr,160*tsr], rspeed:[90,85*rsr,105*rsr], randomness:[12,4*randr,20*randr], tint: [200,165*tir,270*tir], irand:[27,0*irr,87*irr],});
@@ -209,7 +547,8 @@ var irr = 100/(ir[1]-ir[0]);
       }
       break;
     case "squeeze":
-        this.setState({ticon:squeeze, tname: "Squeeze"});
+      this.serialmsg[0]=6;
+        this.setState({ticon:squeeze, tname: "Squeeze",happiness:"suggested", fear:"suggested",sympathy:null,sadness:"suggested",anger: "suggested",disgust: null,love: "suggested",gratitude: "suggested",});
         if(ename!=null){
         if (ename.toLowerCase() === "anger") {
             this.setState({trange:[60,60*trr,60*trr], tspeed:[285,257*tsr,315*tsr], rspeed:[120,99*rsr,153*rsr], randomness:[17,13*randr,21*randr], tint: [135,117*tir,152*tir], irand:[97,83*irr,111*irr],});
@@ -227,7 +566,8 @@ var irr = 100/(ir[1]-ir[0]);
         }
         break;
     case "hit":
-        this.setState({ticon: hit, tname: "Hit"});
+      this.serialmsg[0]=2;
+        this.setState({ticon: hit, tname: "Hit" ,happiness:null, fear:null,sympathy:null,sadness:null,anger: "anger",disgust: null,love: null,gratitude: null,});
         if(ename!=null){
         if (ename.toLowerCase() === "anger") {
             this.setState({trange:[70,30*trr,70*trr], tspeed:[225,198*tsr,258*tsr], rspeed:[90,66*rsr,132*rsr], randomness:[5,0*randr,5*randr], tint: [280,170*tir,290*tir], irand:[0,0*irr,40*irr],});
@@ -237,7 +577,8 @@ var irr = 100/(ir[1]-ir[0]);
         }
         break;
     case "pat":
-      this.setState({ticon: pat, tname: "Pat"});
+      this.serialmsg[0]=2;
+      this.setState({ticon: pat, tname: "Pat",happiness:null, fear:null,sympathy:"suggested",sadness:"suggested",anger: null,disgust: null,love: "suggested",gratitude: "suggested",});
       if(ename!=null){
       if (ename.toLowerCase() === "gratitude") {
           this.setState({trange:[50,40*trr,50*trr], tspeed:[82,70*tsr,94*tsr], rspeed:[60,50*rsr,70*rsr], randomness:[8,4*randr,15*randr], tint: [635,467*tir,802*tir], irand:[25,12*irr,38*irr],});
@@ -252,7 +593,8 @@ var irr = 100/(ir[1]-ir[0]);
         }}
       break;
     case "push":
-      this.setState({ticon: push, tname: "Push"});
+      this.serialmsg[0]=3;
+      this.setState({ticon: push, tname: "Push",happiness:null, fear:null,sympathy:null,sadness:"suggested",anger: "suggested",disgust: "suggested",love: null,gratitude: null,});
       if(ename!=null){
       if (ename.toLowerCase() === "anger") {
           this.setState({trange:[60,50*trr,70*trr], tspeed:[105,96*tsr,144*tsr], rspeed:[120,84*rsr,144*rsr], randomness:[10,0*randr,15*randr], tint: [0,0*tir,300*tir], irand:[0,0*irr,70*irr],});
@@ -265,13 +607,18 @@ var irr = 100/(ir[1]-ir[0]);
         }}
       break;
     case "rub":
-      this.setState({ticon: rub, tname:"Rub"});
+      this.serialmsg[0]=4;
+      this.setState({ticon: rub, tname:"Rub",happiness:null, fear:null,sympathy:"suggested",sadness:null,anger: null,disgust: null,love: "suggested",gratitude: null,});
+      this.setState({trange:[0,0*trr,0*trr], tspeed:[0,0*tsr,0*tsr], rspeed:[0,0*rsr,0*rsr], randomness:[0,0*randr,0*randr], tint: [0,0*tir,0*tir], irand:[0,0*irr,0*irr],});
       break;
     case "stroke":
-      this.setState({ticon: stroke, tname: "Stroke"});
+      this.serialmsg[0]=7;
+      this.setState({ticon: stroke, tname: "Stroke",happiness:null, fear:null,sympathy:"suggested",sadness:"suggested",anger: null,disgust: null,love: "suggested",gratitude: null,});
+      this.setState({trange:[0,0*trr,0*trr], tspeed:[0,0*tsr,0*tsr], rspeed:[0,0*rsr,0*rsr], randomness:[0,0*randr,0*randr], tint: [0,0*tir,0*tir], irand:[0,0*irr,0*irr],});
       break;
     case "tap":
-      this.setState({ticon: tap, tname:"Tap"});
+      this.serialmsg[0]=8;
+      this.setState({ticon: tap, tname:"Tap",happiness:null, fear:null,sympathy:null,sadness:null,anger: null,disgust: null,love: null,gratitude: "suggested",});
       if(ename!=null){
       if (ename.toLowerCase() === "anger") {
           this.setState({trange:[50,40*trr,70*trr], tspeed:[125,110*tsr,140*tsr], rspeed:[85,72*rsr,90*rsr], randomness:[5,3*randr,15*randr], tint: [300,190*tir,480*tir], irand:[20,10*irr,40*irr],});
@@ -283,6 +630,18 @@ var irr = 100/(ir[1]-ir[0]);
 
 }
 
+bitshift(number){
+  let data=new Uint8Array(2);
+  data[0] = number & 0xFF;
+  data[1] = (number >> 8) & 0xFF;
+  let reverse=data.join();
+  reverse = reverse.replace(',','')
+  console.log(parseInt(reverse,reverse.length));
+  return data;
+
+
+}
+
 
 handleSlider(name){
 switch (name) {
@@ -290,35 +649,60 @@ switch (name) {
     let tranger = [this.state.trange];
     tranger[0] = document.getElementById("touch-range").value;
     this.setState({trange: tranger});
+    this.serialmsg[3] = tranger[0];
     break;
   case "tspeed":
     let tspeeder = [this.state.tspeed];
     tspeeder[0] = document.getElementById("speed-touch").value;
     this.setState({tspeed: tspeeder});
+    this.serialmsg[1] = (tspeeder[0]/15);
     break;
   case "rspeed":
     let rspeeder = [this.state.rspeed];
     rspeeder[0] = document.getElementById("speed-retreat").value;
     this.setState({rspeed: rspeeder});
+    this.serialmsg[2] = (rspeeder[0]/15);
     break;
   case "randomness":
     let rander = [this.state.randomness];
     rander[0] = document.getElementById("touch-randomness").value;
     this.setState({randomness: rander});
+    this.serialmsg[4] = rander[0];
     break;
   case "tint":
     let tinter = [this.state.tint];
     tinter[0] = document.getElementById("touch-interval").value;
     this.setState({tint:tinter});
+    this.serialmsg[7] = (tinter[0]/10);
     break;
   case "irand":
     let irander = [this.state.irand];
     irander[0] = document.getElementById("interval-randomness").value;
     this.setState({irand:irander});
+    this.serialmsg[5] = irander[0]
     break;
 }
+  console.log(this.serialmsg);
+  this.start(this.serialmsg);
 
 }
+
+pp(play){
+  if(this.state.tselected){
+  if(play){
+    this.serialmsg[8]=0;
+  }else{
+    this.serialmsg[8]=1;
+  }
+  console.log(this.serialmsg);
+  this.start(this.serialmsg);
+}else{
+    alert("Tactor not selected, you must select a tactor before uploading tactor behavior.");
+  }
+
+  //this.start(this.serialmsg);
+}
+
 
 
 
@@ -326,43 +710,431 @@ switch (name) {
 
   render(){
 
-  return(
+//console.log(this.bitshift(400));
 
-      <section className="page-content">
-            <div className ="row left-nav group1">
-              <div className="col-2 bg-light  sidebar d-flex">
-                <div className ="row left-nav group1">
-                <div className="col-12 left-col">
+
+
+  return(
+    <div>
+    <nav className="navbar top-nav navbar-expand navbar-light bg-white ">
+  <h6 className="navbar-brand" onClick={() => this.handleClick("tbots")}>Tactor Bots</h6>
+
+  <div className="navbar-collapse" id="navbarSupportedContent">
+    <ul className="top-nav navbar-nav mr-auto ml-auto d-flex align-content-center">
+      <li className={"top-nav nav-item active text-center "+ this.state.generator[1]}>
+        <a className= {"top-nav nav-link " + this.state.generator[1]}   onClick={() => this.handleClick("tgen")}>Touch Generator{this.state.generator[0]&&(<span className="sr-only">(current)</span>)}</a>
+      </li>
+      <li className={"top-nav nav-item active text-center "+ this.state.tinfo[1]}>
+        <a className={"top-nav nav-link " + this.state.tinfo[1]}   onClick={() => this.handleClick("tinfo")}>Tactor Information{this.state.tinfo[0]&&(<span className="sr-only">(current)</span>)}</a>
+      </li>
+      <li className={"top-nav nav-item active text-center "+ this.state.archive[1]}>
+        <a className={"top-nav nav-link " + this.state.archive[1]}    onClick={() => this.handleClick("archive")}>Archive{this.state.archive[0]&&(<span className="sr-only">(current)</span>)}</a>
+      </li>
+    </ul>
+
+  </div>
+  </nav>
+
+<section className="page-content">
+        <main role="main page">
+
+      {this.state.tinfo[0] &&(
+        <div className="row left-nav group1 tinfo">
+          <div className="col-2 bg-light  sidebar d-flex tinfo">
+            <div class ="row left-nav group1">
+              <div className="col-12 left-col">
                 <nav className="navbar left-nav navbar-expand navbar-light">
-                <ul className="left-nav nav-item text-left">
-                  <li className={"left-nav nav-link " + this.state.estate} href="#"  onClick={() => this.handleClick("emotion")}><a className="left-nav nav-link"><img src={emotion} alt="" className="left-nav icon"/>Emotion</a></li>
-                  {this.state.eselected && (
-                  <div className="row justify-content-center">
-                    <div className="col col-auto bg-white sidebar-emotion-box">
-                      <img src={this.state.eicon} alt="" className="emotion-logo happiness sidebar-emotion" />
-                      <h4 className="text-center">{this.state.ename}</h4>
+                  <ul className="left-nav text-left tinfo">
+                    <li className={"left-nav tactorinfonav nav-link col col-auto tactorlink nav-link " + this.state.hit1[1]} onClick={() => this.handleClick("hit1")}>
+                    <div className="row flex-nowrap">
+                      <div className="col">
+                        <div className={"tactoricon d-flex justify-content-start " + this.state.hit1[1]}>
+                          <img src={this.state.hit1[0] ? hitw  : hit} alt="" className="tactorinfoicon"/>
+                        </div>
+                      </div>
+                      <div className="col tactinfo">
+                        <h4 className="tactinfo">Hit</h4>
+                        <br/>
+                        <h5 className="tactinfo">Tactor 1</h5><img src={link} alt="" className="tactinfo"/><h5 className="tactinfo"> Pin 2</h5>
+                      </div>
                     </div>
-                  </div>
-                )}
-                  <li className={"left-nav nav-link " + this.state.tstate} href="#" onClick={() => this.handleClick("tactor")}><a className="left-nav nav-link" ><img src={tactor} alt="" className="left-nav icon"/>Tactor</a></li>
-                  {this.state.tselected && (
-                  <div className="row justify-content-center">
-                    <div className="col col-auto bg-white sidebar-tactor-box">
-                      <img src={this.state.ticon} alt="" className="tactor-logo happiness sidebar-tactor"/>
-                      <h4 className="text-center">{this.state.tname}</h4>
-                    </div>
-                  </div>
-                )}
-                  <li className={"left-nav nav-link "+ this.state.bstate} href="#"><a className="left-nav nav-link" onClick={() => this.handleClick("behavior")}><img src={behavior} alt="" className="left-nav icon"/>Behavior</a></li>
-                </ul>
-              </nav>
+                    </li>
+                    <li className={"left-nav tactorinfonav nav-link col col-auto tactorlink nav-link " + this.state.pat1[1]}  onClick={() => this.handleClick("pat1")}>
+                      <div className="row flex-nowrap">
+                        <div className="col">
+                          <div className={"tactoricon d-flex justify-content-start " + this.state.pat1[1]}>
+                            <img src={this.state.pat1[0] ? patw  : pat} alt="" className="tactorinfoicon"/>
+                          </div>
+                        </div>
+                        <div className="col tactinfo">
+                          <h4 className="tactinfo">Pat</h4>
+                          <br/>
+                          <h5 className="tactinfo">Tactor 2</h5><img src={link} alt="" className="tactinfo"/><h5 className="tactinfo"> Pin 2</h5>
+                        </div>
+                      </div>
+                    </li>
+                    <li className={"left-nav tactorinfonav nav-link col col-auto tactorlink nav-link " + this.state.push1[1]}  onClick={() => this.handleClick("push1")}>
+                      <div className="row flex-nowrap">
+                        <div className="col">
+                          <div className={"tactoricon d-flex justify-content-start " + this.state.push1[1]}>
+                            <img src={this.state.push1[0] ? pushw  : push} alt="" className="tactorinfoicon"/>
+                          </div>
+                        </div>
+                        <div className="col tactinfo">
+                          <h4 className="tactinfo">Push</h4>
+                          <br/>
+                          <h5 className="tactinfo">Tactor 3</h5><img src={link} alt="" className="tactinfo"/><h5 className="tactinfo"> Pin 3</h5>
+                        </div>
+                      </div>
+                    </li>
+                    <li className={"left-nav tactorinfonav nav-link col col-auto tactorlink nav-link " + this.state.rub1[1]}  onClick={() => this.handleClick("rub1")}>
+                      <div className="row flex-nowrap">
+                        <div className="col">
+                          <div className={"tactoricon d-flex justify-content-start " + this.state.rub1[1]}>
+                            <img src={this.state.rub1[0] ? rubw  : rub} alt="" className="tactorinfoicon"/>
+                          </div>
+                        </div>
+                        <div className="col tactinfo">
+                          <h4 className="tactinfo">Rub</h4>
+                          <br/>
+                          <h5 className="tactinfo">Tactor 4</h5><img src={link} alt="" className="tactinfo"/><h5 className="tactinfo"> Pin 4</h5>
+                        </div>
+                      </div>
+                    </li>
+                    <li className={"left-nav tactorinfonav nav-link col col-auto tactorlink nav-link " + this.state.shake1[1]}  onClick={() => this.handleClick("shake1")}>
+                      <div className="row flex-nowrap">
+                        <div className="col">
+                          <div className={"tactoricon d-flex justify-content-start " + this.state.shake1[1]}>
+                            <img src={this.state.shake1[0] ? shakew  : shake} alt="" className="tactorinfoicon"/>
+                          </div>
+                        </div>
+                        <div className="col tactinfo">
+                          <h4 className="tactinfo">Shake</h4>
+                          <br/>
+                          <h5 className="tactinfo">Tactor 5</h5><img src={link} alt="" className="tactinfo"/><h5 className="tactinfo"> Pin 5</h5>
+                        </div>
+                      </div>
+                    </li>
+                    <li className={"left-nav tactorinfonav nav-link col col-auto tactorlink nav-link " + this.state.squeeze1[1]}  onClick={() => this.handleClick("squeeze1")}>
+                      <div className="row flex-nowrap">
+                        <div className="col">
+                          <div className={"tactoricon d-flex justify-content-start " + this.state.squeeze1[1]}>
+                            <img src={this.state.squeeze1[0] ? squeezew  : squeeze} alt="" className="tactorinfoicon"/>
+                          </div>
+                        </div>
+                        <div className="col tactinfo">
+                          <h4 className="tactinfo">Squeeze</h4>
+                          <br/>
+                          <h5 className="tactinfo">Tactor 6</h5><img src={link} alt="" className="tactinfo"/><h5 className="tactinfo"> Pin 6</h5>
+                        </div>
+                      </div>
+                    </li>
+                    <li className={"left-nav tactorinfonav nav-link col col-auto tactorlink nav-link " + this.state.stroke1[1]}  onClick={() => this.handleClick("stroke1")}>
+                      <div className="row flex-nowrap">
+                        <div className="col">
+                          <div className={"tactoricon d-flex justify-content-start " + this.state.stroke1[1]}>
+                            <img src={this.state.stroke1[0] ? strokew  : stroke} alt="" className="tactorinfoicon"/>
+                          </div>
+                        </div>
+                        <div className="col tactinfo">
+                          <h4 className="tactinfo">Stroke</h4>
+                          <br/>
+                          <h5 className="tactinfo">Tactor 7</h5><img src={link} alt="" className="tactinfo"/><h5 className="tactinfo"> Pin 7</h5>
+                        </div>
+                      </div>
+                    </li>
+                    <li className={"left-nav tactorinfonav nav-link col col-auto tactorlink nav-link " + this.state.tap1[1]}  onClick={() => this.handleClick("tap1")}>
+                      <div className="row flex-nowrap">
+                        <div className="col">
+                          <div className={"tactoricon d-flex justify-content-start " + this.state.tap1[1]}>
+                            <img src={this.state.tap1[0] ? tapw  : tap} alt="" className="tactorinfoicon"/>
+                          </div>
+                        </div>
+                        <div className="col tactinfo">
+                          <h4 className="tactinfo">Tap</h4>
+                          <br/>
+                          <h5 className="tactinfo">Tactor 8</h5><img src={link} alt="" className="tactinfo"/><h5 className="tactinfo"> Pin 8</h5>
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+          <div class="col-10 main-content">
+            <section class="main-head">
+
+
+              <h2>{this.state.acttact[3]} Tactor</h2>
+              <h3></h3>
+
+            </section>
+            <section class="generator-table">
+              <div class="row generator justify-content-center">
+                <div class="col col-auto">
+                  <div class="row">
+                    <div class="col">
+                  <div class="bg-light tactortop-box  d-flex align-items-center">
+                  <img src={this.state.up} alt="" class="generator-logo tactortop"/>
                 </div>
                 </div>
+              </div>
+              <div class="row">
+                <div class="col">
+              <div class="bg-light tactorside-box  d-flex align-items-center">
+              <img src={this.state.cut} alt="" class="generator-logo tactorside"/>
+            </div>
+
+              <h4 class="d-flex justify-content-center text-center mx-auto tactoroverview">Tactor Overview</h4>
+            </div>
+          </div>
+                </div>
+
+
+                <div class="col col-auto">
+                  <div class="bg-light  tactorplacement-box  tactorinfo d-flex align-items-center">
+                    <img src={this.state.place} alt="" class="generator-logo tactorplacement"/>
+                  </div>
+                  <h4 class="text-center mx-auto">Tactor Placement</h4>
+                </div>
+
+                <div class="col col-auto">
+                  <div class="bg-light  tactorplacement-box  tactorinfo d-flex align-items-center">
+
+                    {this.state.hit1[0] &&(
+                      <div class="row tactor-emotion d-flex justify-items-center">
+                      <div class="col col-12 tactor-emotion">
+                      <img src={anger} alt="" class="tactor-emotion"/>
+                      <h4 class="text-center tactor-emotion">Anger</h4>
+                    </div>
+                    </div>
+                  )}
+                  {this.state.tap1[0] &&(
+                    <div class="row tactor-emotion d-flex justify-items-center">
+                    <div class="col col-12 tactor-emotion">
+                    <img src={gratitude} alt="" class="tactor-emotion"/>
+                    <h4 class="text-center tactor-emotion">Gratitude</h4>
+                  </div>
+                  </div>
+                )}
+                {this.state.stroke1[0] &&(
+                  <div class="row tactor-emotion d-flex justify-items-center">
+                  <div class="col col-7 tactor-emotion mx-auto">
+                  <img src={love} alt="" class="tactor-emotion"/>
+                  <h4 class="text-center tactor-emotion">Love</h4>
+                </div>
+                  <div class="w-100"></div>
+                <div class="col col-7 tactor-emotion mx-auto">
+                <img src={sympathy} alt="" class="tactor-emotion"/>
+                <h4 class="text-center tactor-emotion">Sympathy</h4>
+              </div>
+              <div class="w-100"></div>
+              <div class="col col-7 tactor-emotion mx-auto">
+              <img src={sadness} alt="" class="tactor-emotion"/>
+              <h4 class="text-center tactor-emotion">Sadness</h4>
+            </div>
+            </div>
+          )}{this.state.squeeze1[0] &&(
+            <div class="row tactor-emotion d-flex justify-items-center">
+                  <div class="col col-6 tactor-emotion">
+                  <img src={fear} alt="" class="tactor-emotion"/>
+                  <h4 class="text-center tactor-emotion">Fear</h4>
+                </div>
+                    <div class="col col-6 tactor-emotion">
+                      <img src={love} alt="" class="tactor-emotion"/>
+                      <h4 class="text-center tactor-emotion">Love</h4>
+                    </div>
+                    <div class="w-100"></div>
+                    <div class="col col-6 tactor-emotion">
+                    <img src={anger} alt="" class="tactor-emotion"/>
+                    <h4 class="text-center tactor-emotion">Anger</h4>
+                    </div>
+                    <div class="col col-6 tactor-emotion">
+                      <img src={happiness} alt="" class="tactor-emotion"/>
+                      <h4 class="text-center tactor-emotion">Happiness</h4>
+                    </div>
+                    <div class="w-100"></div>
+                    <div class="col col-6 tactor-emotion">
+                    <img src={gratitude} alt="" class="tactor-emotion"/>
+                    <h4 class="text-center tactor-emotion">Gratitude</h4>
+                    </div>
+                    <div class="col col-6 tactor-emotion">
+                      <img src={sadness} alt="" class="tactor-emotion"/>
+                      <h4 class="text-center tactor-emotion">Sadness</h4>
+                    </div>
+                  </div>)}
+                    {this.state.shake1[0] &&(
+                      <div class="row tactor-emotion d-flex justify-items-center">
+                            <div class="col col-6 tactor-emotion">
+                            <img src={happiness} alt="" class="tactor-emotion"/>
+                            <h4 class="text-center tactor-emotion">Happiness</h4>
+                          </div>
+                              <div class="col col-6 tactor-emotion">
+                                <img src={gratitude} alt="" class="tactor-emotion"/>
+                                <h4 class="text-center tactor-emotion">Gratitude</h4>
+                              </div>
+                              <div class="w-100"></div>
+                              <div class="col col-6 tactor-emotion">
+                              <img src={love} alt="" class="tactor-emotion"/>
+                              <h4 class="text-center tactor-emotion">Love</h4>
+                              </div>
+                              <div class="col col-6 tactor-emotion">
+                                <img src={sadness} alt="" class="tactor-emotion"/>
+                                <h4 class="text-center tactor-emotion">Sadness</h4>
+                              </div>
+                              <div class="w-100"></div>
+                              <div class="col col-6 tactor-emotion">
+                              <img src={sympathy} alt="" class="tactor-emotion"/>
+                              <h4 class="text-center tactor-emotion">Sympathy</h4>
+                              </div>
+                              </div>
+                            )}
+                            {this.state.rub1[0] &&(
+                              <div class="row tactor-emotion d-flex justify-items-center">
+                              <div class="col col-7 tactor-emotion mx-auto">
+                              <img src={love} alt="" class="tactor-emotion"/>
+                              <h4 class="text-center tactor-emotion">Love</h4>
+                            </div>
+                            <div class="w-100"></div>
+                            <div class="col col-7 tactor-emotion mx-auto">
+                            <img src={sympathy} alt="" class="tactor-emotion"/>
+                            <h4 class="text-center tactor-emotion">Sympathy</h4>
+                          </div>
+                          </div>
+                      )}  {this.state.push1[0] &&(
+                        <div class="row tactor-emotion d-flex justify-items-center">
+                          <div class="col col-7 tactor-emotion mx-auto">
+                          <img src={disgust} alt="" class="tactor-emotion"/>
+                          <h4 class="text-center tactor-emotion">Disgust</h4>
+                        </div>
+                        <div class="w-100"></div>
+                        <div class="col col-7 tactor-emotion mx-auto">
+                        <img src={anger} alt="" class="tactor-emotion"/>
+                        <h4 class="text-center tactor-emotion">Anger</h4>
+                      </div>
+                      <div class="w-100"></div>
+                      <div class="col col-7 tactor-emotion mx-auto">
+                      <img src={sadness} alt="" class="tactor-emotion"/>
+                      <h4 class="text-center tactor-emotion">Sadness</h4>
+                    </div>
+                    </div>
+                  )}
+                  {this.state.pat1[0] &&(
+                    <div class="row tactor-emotion d-flex justify-items-center">
+                          <div class="col col-6 tactor-emotion">
+                          <img src={sympathy} alt="" class="tactor-emotion"/>
+                          <h4 class="text-center tactor-emotion">Sympathy</h4>
+                        </div>
+                            <div class="col col-6 tactor-emotion">
+                              <img src={love} alt="" class="tactor-emotion"/>
+                              <h4 class="text-center tactor-emotion">Love</h4>
+                            </div>
+                            <div class="w-100"></div>
+                            <div class="col col-6 tactor-emotion">
+                            <img src={gratitude} alt="" class="tactor-emotion"/>
+                            <h4 class="text-center tactor-emotion">Gratitude</h4>
+                            </div>
+
+                            <div class="col col-6 tactor-emotion">
+                              <img src={sadness} alt="" class="tactor-emotion "/>
+                              <h4 class="text-center tactor-emotion">Sadness</h4>
+                            </div>
+                          </div>)}
+
+
+                  </div>
+                  <h4 class="text-center  mx-auto">Associated Emotion</h4>
+                </div>
+              </div>
+            </section>
+            <div class="row buttons">
+              <div class="col col-3 tactorinfonav d-flex align-content-end tactselected">
+                <div class="row flex-nowrap">
+                  <div class="col">
+                    <div class="tactoricon d-flex justify-content-start">
+                      <img src={this.state.acttact[0]} alt="" class="tactorinfoicon"/>
+                    </div>
+                  </div>
+                  <div class="col tactinfo">
+              <h4 class="tactinfo">{this.state.acttact[3]}</h4>
+            <br/>
+              <h5 class="tactinfo">{this.state.acttact[1]}</h5><img src={link} alt="" class="tactinfo"/><h5 class="tactinfo"> {this.state.acttact[2]}</h5>
+            </div>
+
+            </div>
+          </div>
+              <div class="col float-right activated d-flex align-items-end justify-content-end">
+              <h4 class="activated">Please make sure you have activated the tactor.</h4>
+              <button class="align-items-center" id="activated"  onClick={() => this.activate(this.state.acttact[3])}>
+              <h6 class="text-center activated">Activate</h6>
+            </button>
+
+            </div>
+          </div>
+          </div>
+        </div>
+      )}
+
+      {this.state.generator[0] && (
+        <div className ="row left-nav group1 dflex flex-nowrap">
+              <div className="col col-2 bg-light  sidebar d-flex">
+                <div className ="row left-nav group1">
+                  <div className="col-12 left-col">
+                    <nav className="navbar left-nav navbar-expand navbar-light">
+                      <ul className="left-nav nav-item text-left">
+                        <li className={"left-nav nav-link " + this.state.estate}    onClick={() => this.handleClick("emotion")}>
+                          <a className="left-nav nav-link">
+                            <img src={emotion} alt="" className="left-nav icon"/>
+                            Emotion
+                          </a>
+                        </li>
+
+                        {this.state.eselected && (
+                          <div className="row justify-content-center">
+                            <div className="col col-auto bg-white sidebar-emotion-box">
+                              <img src={this.state.eicon} alt="" className="emotion-logo happiness sidebar-emotion" />
+                              <h4 className="text-center">{this.state.ename}</h4>
+                            </div>
+                          </div>
+                        )}
+
+                        <li className={"left-nav nav-link " + this.state.tstate}   onClick={() => this.handleClick("tactor")}>
+                          <a className="left-nav nav-link" >
+                            <img src={tactor} alt="" className="left-nav icon"/>
+                            Tactor
+                          </a>
+                        </li>
+
+                        {this.state.tselected && (
+                        <div className="row justify-content-center">
+                          <div className="col col-auto bg-white sidebar-tactor-box">
+                            <img src={this.state.ticon} alt="" className="tactor-logo happiness sidebar-tactor"/>
+                            <h4 className="text-center">{this.state.tname}</h4>
+                          </div>
+                        </div>
+                        )}
+
+                        <li className={"left-nav nav-link "+ this.state.bstate}  >
+                          <a className="left-nav nav-link" onClick={() => this.handleClick("behavior")}>
+                            <img src={behavior} alt="" className="left-nav icon"/>
+                            Behavior
+                          </a>
+                        </li>
+                      </ul>
+                    </nav>
+                  </div>
+                </div>
+
 
               </div>
+
+
+
+
               {this.state.home && (
 
-              <div className="col-10 main-content">
+              <div className="col col-10 main-content">
               <section className="main-head">
 
 
@@ -394,6 +1166,7 @@ switch (name) {
               </section>
               </div>
             )}
+
             {this.state.emotion && (
               <div className="col-10 main-content">
               <section className="main-head">
@@ -406,7 +1179,7 @@ switch (name) {
               <section className="emotion-table">
                 <div className="row emotion">
                   <div className="col">
-                    <div className="bg-light emotion-box emotion d-flex align-items-center" onClick={() => (this.emotionSelect("happiness"), this.handleClick("emotionselect"))}>
+                    <div className={"bg-light emotion-box emotion d-flex align-items-center "+ this.state.happiness} onClick={() => (this.emotionSelect("happiness"), this.handleClick("emotionselect"))}>
                     <img src={happiness} alt="" className="emotion-logo happiness"/>
                   </div>
 
@@ -414,19 +1187,19 @@ switch (name) {
 
                   </div>
                   <div className="col">
-                    <div className="bg-light  emotion-box emotion d-flex align-items-center" onClick={() => (this.emotionSelect("fear"), this.handleClick("emotionselect"))}>
+                    <div className={"bg-light emotion-box emotion d-flex align-items-center "+ this.state.fear} onClick={() => (this.emotionSelect("fear"), this.handleClick("emotionselect"))}>
                       <img src={fear} alt="" className="emotion-logo fear"/>
                     </div>
                     <h4 className="text-center">Fear</h4>
                   </div>
                   <div className="col">
-                    <div className="bg-light  emotion-box emotion d-flex align-items-center"  onClick={() => (this.emotionSelect("sympathy"), this.handleClick("emotionselect"))}>
+                    <div className={"bg-light emotion-box emotion d-flex align-items-center "+ this.state.sympathy} onClick={() => (this.emotionSelect("sympathy"), this.handleClick("emotionselect"))}>
                         <img src={sympathy} alt="" className="emotion-logo sympathy"/>
                     </div>
                     <h4 className="text-center">Sympathy</h4>
                   </div>
                   <div className="col">
-                    <div className="bg-light  emotion-box emotion d-flex align-items-center"  onClick={() => (this.emotionSelect("sadness"), this.handleClick("emotionselect"))}>
+                    <div className={"bg-light emotion-box emotion d-flex align-items-center "+ this.state.sadness}  onClick={() => (this.emotionSelect("sadness"), this.handleClick("emotionselect"))}>
                       <img src={sadness} alt="" className="emotion-logo sadness"/>
                     </div>
                     <h4 className="text-center">Sadness</h4>
@@ -434,25 +1207,25 @@ switch (name) {
                 </div>
                 <div className="row emotion">
                   <div className="col">
-                    <div className="bg-light  emotion-box emotion d-flex align-items-center" onClick={() => (this.emotionSelect("anger"), this.handleClick("emotionselect"))}>
+                    <div className={"bg-light emotion-box emotion d-flex align-items-center "+ this.state.anger} onClick={() => (this.emotionSelect("anger"), this.handleClick("emotionselect"))}>
                       <img src={anger} alt="" className="emotion-logo anger"/>
                   </div>
                   <h4 className="text-center">Anger</h4>
                   </div>
                   <div className="col">
-                    <div className="bg-light  emotion-box emotion d-flex align-items-center" onClick={() => (this.emotionSelect("disgust"), this.handleClick("emotionselect"))}>
+                    <div className={"bg-light emotion-box emotion d-flex align-items-center "+ this.state.disgust} onClick={() => (this.emotionSelect("disgust"), this.handleClick("emotionselect"))}>
                       <img src={disgust} alt="" className="emotion-logo disgust"/>
                     </div>
                     <h4 className="text-center">Disgust</h4>
                   </div>
                   <div className="col">
-                    <div className="bg-light  emotion-box emotion d-flex align-items-center" onClick={() => (this.emotionSelect("love"), this.handleClick("emotionselect"))}>
+                    <div className={"bg-light emotion-box emotion d-flex align-items-center "+ this.state.love} onClick={() => (this.emotionSelect("love"), this.handleClick("emotionselect"))}>
                       <img src={love} alt="" className="emotion-logo love"/>
                     </div>
                     <h4 className="text-center">Love</h4>
                   </div>
                   <div className="col">
-                    <div className="bg-light  emotion-box emotion d-flex align-items-center" onClick={() => (this.emotionSelect("gratitude"), this.handleClick("emotionselect"))}>
+                    <div className={"bg-light emotion-box emotion d-flex align-items-center "+ this.state.gratitude} onClick={() => (this.emotionSelect("gratitude"), this.handleClick("emotionselect"))}>
                       <img src={gratitude} alt="" className="emotion-logo gratitude"/>
                     </div>
                     <h4 className="text-center">Gratitude</h4>
@@ -460,8 +1233,8 @@ switch (name) {
                 </div>
               </section>
             </div>
-
             )}
+
             {this.state.tactor && (
               <div className="col-10 main-content">
                 <section className="main-head">
@@ -474,7 +1247,7 @@ switch (name) {
                 <section className="emotion-table">
                   <div className="row emotion">
                     <div className="col">
-                      <div className={"emotion-box emotion d-flex align-items-center " + this.state.shake}  onClick={() => (this.tactorSelect("shake", this.state.ename), this.handleClick("tactselect"))}>
+                      <div className={"emotion-box emotion d-flex align-items-center " + this.state.shake}  onClick={() => (this.tactorSelect("shake", this.state.ename), this.handleClick("shake"))}>
                       <img src={shake} alt="" className="emotion-logo happiness"/>
                     </div>
 
@@ -482,19 +1255,19 @@ switch (name) {
 
                     </div>
                     <div className="col">
-                      <div className={"emotion-box emotion d-flex align-items-center " + this.state.squeeze} onClick={() => (this.tactorSelect("squeeze", this.state.ename), this.handleClick("tactselect"))}>
+                      <div className={"emotion-box emotion d-flex align-items-center " + this.state.squeeze} onClick={() => (this.tactorSelect("squeeze", this.state.ename), this.handleClick("squeeze"))}>
                         <img src={squeeze} alt="" className="emotion-logo fear"/>
                       </div>
                       <h4 className="text-center">Squeeze</h4>
                     </div>
                     <div className="col">
-                      <div className={"emotion-box emotion d-flex align-items-center " + this.state.hit}  onClick={() => (this.tactorSelect("hit", this.state.ename), this.handleClick("tactselect"))}>
+                      <div className={"emotion-box emotion d-flex align-items-center " + this.state.hit}  onClick={() => (this.tactorSelect("hit", this.state.ename), this.handleClick("hit"))}>
                           <img src={hit} alt="" className="emotion-logo sympathy"/>
                       </div>
                       <h4 className="text-center">Hit</h4>
                     </div>
                     <div className="col">
-                      <div className={"emotion-box emotion d-flex align-items-center " + this.state.pat}  onClick={() => (this.tactorSelect("pat", this.state.ename), this.handleClick("tactselect"))}>
+                      <div className={"emotion-box emotion d-flex align-items-center " + this.state.pat}  onClick={() => (this.tactorSelect("pat", this.state.ename), this.handleClick("pat"))}>
                         <img src={pat} alt="" className="emotion-logo sadness"/>
                       </div>
                       <h4 className="text-center">Pat</h4>
@@ -502,25 +1275,25 @@ switch (name) {
                   </div>
                   <div className="row emotion">
                     <div className="col">
-                      <div className={"emotion-box emotion d-flex align-items-center " + this.state.push}  onClick={() => (this.tactorSelect("push", this.state.ename), this.handleClick("tactselect"))}>
+                      <div className={"emotion-box emotion d-flex align-items-center " + this.state.push}  onClick={() => (this.tactorSelect("push", this.state.ename), this.handleClick("push"))}>
                         <img src={push} alt="" className="emotion-logo anger"/>
                     </div>
                     <h4 className="text-center">Push</h4>
                     </div>
                     <div className="col">
-                      <div className={"emotion-box emotion d-flex align-items-center " + this.state.rub}  onClick={() => (this.tactorSelect("rub", this.state.ename), this.handleClick("tactselect"))}>
+                      <div className={"emotion-box emotion d-flex align-items-center " + this.state.rub}  onClick={() => (this.tactorSelect("rub", this.state.ename), this.handleClick("rub"))}>
                         <img src={rub} alt="" className="emotion-logo disgust"/>
                       </div>
                       <h4 className="text-center">Rub</h4>
                     </div>
                     <div className="col">
-                      <div className={"emotion-box emotion d-flex align-items-center " + this.state.stroke}  onClick={() => (this.tactorSelect("stroke", this.state.ename), this.handleClick("tactselect"))}>
+                      <div className={"emotion-box emotion d-flex align-items-center " + this.state.stroke}  onClick={() => (this.tactorSelect("stroke", this.state.ename), this.handleClick("stroke"))}>
                         <img src={stroke} alt="" className="emotion-logo love"/>
                       </div>
                       <h4 className="text-center">Stroke</h4>
                     </div>
                     <div className="col">
-                      <div className={"emotion-box emotion d-flex align-items-center " + this.state.tap}  onClick={() => (this.tactorSelect("tap", this.state.ename), this.handleClick("tactselect"))}>
+                      <div className={"emotion-box emotion d-flex align-items-center " + this.state.tap}  onClick={() => (this.tactorSelect("tap", this.state.ename), this.handleClick("tap"))}>
                         <img src={tap} alt="" className="emotion-logo gratitude"/>
                       </div>
                       <h4 className="text-center">Tap</h4>
@@ -529,6 +1302,7 @@ switch (name) {
                 </section>
               </div>
             )}
+
             {this.state.behavior && (
               <div className="col-10 main-content">
                 <section className="main-head">
@@ -548,7 +1322,7 @@ switch (name) {
                             <h6 className="slider-value float-right">{this.state.trange[0]}</h6>
                             <br/>
                             <img src={trange} alt="" className="slider-icon"/>
-                          <input type="range" className="slider" id="touch-range" name="touch-range" value={this.state.trange[0]} onInput={() => (this.handleSlider("trange"))} onChange={() => (this.handleSlider("trange"))} min="0" max="180" step="10" style={{background: 'linear-gradient(90deg, rgba(255,255,255,1) '+this.state.trange[1]+'%, rgba(244,179,33,1) '+this.state.trange[1]+'%, rgba(244,179,33,1) '+this.state.trange[2]+ '%, rgba(255,255,255,1) '+ this.state.trange[2]+ '%)'}}/>
+                          <input type="range" className="slider" id="touch-range" name="touch-range" value={this.state.trange[0]} onInput={() => (this.handleSlider("trange"))}  min="0" max="180" step="10" style={{background: 'linear-gradient(90deg, rgba(255,255,255,1) '+this.state.trange[1]+'%, rgba(244,179,33,1) '+this.state.trange[1]+'%, rgba(244,179,33,1) '+this.state.trange[2]+ '%, rgba(255,255,255,1) '+ this.state.trange[2]+ '%)'}}/>
                           </div>
 
                           <div className="slider-div">
@@ -556,7 +1330,7 @@ switch (name) {
                             <h6 className="slider-value float-right">{this.state.tspeed[0]}</h6>
                             <br/>
                             <img src={tspeed} alt="" className="slider-icon"/>
-                          <input type="range" className="slider" id="speed-touch" name="speed-touch" value={this.state.tspeed[0]} onInput={() => (this.handleSlider("tspeed"))} onChange={() => (this.handleSlider("tspeed"))} min="0" max="360" step="15" style={{background: 'linear-gradient(90deg, rgba(255,255,255,1) '+this.state.tspeed[1]+'%, rgba(244,179,33,1) '+this.state.tspeed[1]+'%, rgba(244,179,33,1) '+this.state.tspeed[2]+ '%, rgba(255,255,255,1) '+ this.state.tspeed[2]+ '%)'}}/>
+                          <input type="range" className="slider" id="speed-touch" name="speed-touch" value={this.state.tspeed[0]} onInput={() => (this.handleSlider("tspeed"))}  min="0" max="360" step="15" style={{background: 'linear-gradient(90deg, rgba(255,255,255,1) '+this.state.tspeed[1]+'%, rgba(244,179,33,1) '+this.state.tspeed[1]+'%, rgba(244,179,33,1) '+this.state.tspeed[2]+ '%, rgba(255,255,255,1) '+ this.state.tspeed[2]+ '%)'}}/>
                           </div>
 
                           <div className="slider-div">
@@ -564,7 +1338,7 @@ switch (name) {
                             <h6 className="slider-value float-right">{this.state.rspeed[0]}</h6>
                             <br/>
                             <img src={rspeed} alt="" className="slider-icon"/>
-                          <input type="range" className="slider" id="speed-retreat" value={this.state.rspeed[0]} onInput={() => (this.handleSlider("rspeed"))} onChange={() => (this.handleSlider("rspeed"))} min="0" max="360" step="15" style={{background: 'linear-gradient(90deg, rgba(255,255,255,1) '+this.state.rspeed[1]+'%, rgba(244,179,33,1) '+this.state.rspeed[1]+'%, rgba(244,179,33,1) '+this.state.rspeed[2]+ '%, rgba(255,255,255,1) '+ this.state.rspeed[2]+ '%)'}}/>
+                          <input type="range" className="slider" id="speed-retreat" value={this.state.rspeed[0]} onInput={() => (this.handleSlider("rspeed"))}  min="0" max="360" step="15" style={{background: 'linear-gradient(90deg, rgba(255,255,255,1) '+this.state.rspeed[1]+'%, rgba(244,179,33,1) '+this.state.rspeed[1]+'%, rgba(244,179,33,1) '+this.state.rspeed[2]+ '%, rgba(255,255,255,1) '+ this.state.rspeed[2]+ '%)'}}/>
                           </div>
 
                           <div className="slider-div">
@@ -572,7 +1346,7 @@ switch (name) {
                             <h6 className="slider-value float-right">{this.state.randomness[0]}</h6>
                             <br/>
                             <img src={randomness} alt="" className="slider-icon"/>
-                          <input type="range" className="slider" id="touch-randomness" value={this.state.randomness[0]} onInput={() => (this.handleSlider("randomness"))} onChange={() => (this.handleSlider("randomness"))} min="0" max="50" step="5" style={{background: 'linear-gradient(90deg, rgba(255,255,255,1) '+this.state.randomness[1]+'%, rgba(244,179,33,1) '+this.state.randomness[1]+'%, rgba(244,179,33,1) '+this.state.randomness[2]+ '%, rgba(255,255,255,1) '+ this.state.randomness[2]+ '%)'}}/>
+                          <input type="range" className="slider" id="touch-randomness" value={this.state.randomness[0]} onInput={() => (this.handleSlider("randomness"))}  min="0" max="50" step="5" style={{background: 'linear-gradient(90deg, rgba(255,255,255,1) '+this.state.randomness[1]+'%, rgba(244,179,33,1) '+this.state.randomness[1]+'%, rgba(244,179,33,1) '+this.state.randomness[2]+ '%, rgba(255,255,255,1) '+ this.state.randomness[2]+ '%)'}}/>
                           </div>
 
                           <div className="slider-div">
@@ -580,7 +1354,7 @@ switch (name) {
                             <h6 className="slider-value float-right">{this.state.tint[0]}</h6>
                             <br/>
                             <img src={tint} alt="" className="slider-icon"/>
-                          <input type="range" className="slider" id="touch-interval" value={this.state.tint[0]} onInput={() => (this.handleSlider("tint"))} onChange={() => (this.handleSlider("tint"))} min="0" max="1000" step="10" style={{background: 'linear-gradient(90deg, rgba(255,255,255,1) '+this.state.tint[1]+'%, rgba(244,179,33,1) '+this.state.tint[1]+'%, rgba(244,179,33,1) '+this.state.tint[2]+ '%, rgba(255,255,255,1) '+ this.state.tint[2]+ '%)'}}/>
+                          <input type="range" className="slider" id="touch-interval" value={this.state.tint[0]} onInput={() => (this.handleSlider("tint"))}  min="0" max="1000" step="10" style={{background: 'linear-gradient(90deg, rgba(255,255,255,1) '+this.state.tint[1]+'%, rgba(244,179,33,1) '+this.state.tint[1]+'%, rgba(244,179,33,1) '+this.state.tint[2]+ '%, rgba(255,255,255,1) '+ this.state.tint[2]+ '%)'}}/>
                           </div>
 
                           <div className="slider-div">
@@ -588,7 +1362,7 @@ switch (name) {
                             <h6 className="slider-value float-right">{this.state.irand[0]}</h6>
                             <br/>
                             <img src={irand} alt="" className="slider-icon"/>
-                          <input type="range" className="slider" id="interval-randomness" value={this.state.irand[0]} onInput={() => (this.handleSlider("irand"))} onChange={() => (this.handleSlider("irand"))} min="0" max="300" step="10" style={{background: 'linear-gradient(90deg, rgba(255,255,255,1) '+this.state.irand[1]+'%, rgba(244,179,33,1) '+this.state.irand[1]+'%, rgba(244,179,33,1) '+this.state.irand[2]+ '%, rgba(255,255,255,1) '+ this.state.irand[2]+ '%)'}}/>
+                          <input type="range" className="slider" id="interval-randomness" value={this.state.irand[0]} onInput={() => (this.handleSlider("irand"))} min="0" max="300" step="10" style={{background: 'linear-gradient(90deg, rgba(255,255,255,1) '+this.state.irand[1]+'%, rgba(244,179,33,1) '+this.state.irand[1]+'%, rgba(244,179,33,1) '+this.state.irand[2]+ '%, rgba(255,255,255,1) '+ this.state.irand[2]+ '%)'}}/>
                           </div>
                     </div>
 
@@ -713,23 +1487,23 @@ switch (name) {
                     				/>
                             </div>
                             <div className="d-flex justify-content-center pp">
-                            <img src={play} alt="" id="play-icon" />
-                            <img src={pause} alt="" id="pause-icon"/>
+                            <img src={play} alt="" id="play-icon" onClick={()=> (this.pp(true))} />
+                            <img src={pause} alt="" id="pause-icon" onClick={()=> (this.pp(false))}/>
                           </div>
                       </div>
                       <div className="name-input">
                         <h6 className="name-label">Name</h6>
                         <input type="text" className="text-input" value="Timeline Sample 1"/>
                         <button className="archive float-right">
-                        <h6 className="archive slider-label">Refer to Archive</h6>
-                        <img src={arrow} alt="" className="archive"/>
+                        <h6 className="archive slider-label" onClick={()=>alert("Archive is not yet an active feature. Stay Tuned!")}>Refer to Archive</h6>
+                        <img src={arrow} alt="" className="archive" onClick={()=>alert("Archive is not yet an active feature. Stay Tuned!")}/>
                       </button>
                       </div>
                       <div className="buttons">
-                        <button className="float-right align-items-center" id="save">
+                        <button className="float-right align-items-center" id="save" onClick={()=>alert("Archive is not yet an active feature. Stay Tuned!")}>
                         <h6>Save</h6>
                       </button>
-                        <button className="float-right align-items-center" id="export">
+                        <button className="float-right align-items-center" id="export" onClick={()=>alert("Archive is not yet an active feature. Stay Tuned!")}>
                         <h6>Export</h6>
                       </button>
 
@@ -740,13 +1514,20 @@ switch (name) {
 
                   </div>
                   </section>
+
                 </div>
             )}
+            </div>
+            )}
 
-              </div>
-          </section>
+</main>
+
+</section>
+</div>
 )
+
 }
+
 }
 
 export default LeftNav;
