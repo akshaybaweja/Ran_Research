@@ -61,7 +61,6 @@ import squeezeplace from "./Icons/Placement Image/Squeeze_placement-17.png";
 import strokeplace from "./Icons/Placement Image/Stroke_placement-18.png";
 import tapplace from "./Icons/Placement Image/Tap_placement-19.png";
 
-
 import Emotion from './emotion';
 import Sketch from 'react-p5';
 
@@ -75,11 +74,7 @@ import Sketch from 'react-p5';
 //Add serial library
 //Add Archive
 
-
-
 class LeftNav extends React.Component{
-
-
 angle = 0;
 count = 0;
 x =0;
@@ -88,8 +83,6 @@ from = false;
 volhistory = [];
 port = null;
 serialmsg = [0, 12, 12, 90, 25, 150, 0, 50, 0];
-
-
 
 constructor(props) {
   super(props);
@@ -136,7 +129,7 @@ constructor(props) {
     place:hitplace,
     cut:patcut,
     up:patup,
-    acttact:[hit, "Tactor 1", "Pin 2", "Hit"],
+    acttact:[hit, "Tactor 1", "Pin 2", "Hit", false],
     happiness:null,
     fear:null,
     sympathy:null,
@@ -145,7 +138,15 @@ constructor(props) {
     disgust: null,
     love: null,
     gratitude: null,
+    archiveData: [],
+    username: "akshaybaweja",
+    fileName: "Timeline Sample 1",
   };
+  this.handleChange = this.handleChange.bind(this);
+}
+
+handleChange(event) {
+  this.setState({fileName: event.target.value});
 }
 
 async write(port, slider){
@@ -189,8 +190,6 @@ async start(data) {
   this.write(this.port, data);
 };
 
-
-
 handleClick(name) {
   var hitstate=this.state.hit1;
   var patstate=this.state.pat1;
@@ -212,16 +211,13 @@ handleClick(name) {
       if(this.state.tselected){
         this.setState({home: false, emotion: false, estate:null, tactor: false, tstate:null, behavior: true, bstate:"active"});
       }else{
-
         this.setState({home: false, emotion: false, estate:null, tactor: true, tstate:"active", behavior: false, bstate: null});
       }
       break;
     case "tactselect":
       if(this.state.eselected){
-
         this.setState({home: false, emotion: false, estate:null, tactor: false, tstate:null, behavior: true, bstate:"active"});
       }else{
-
         this.setState({ home: false, emotion:true, estate:"active", tactor: false, tstate:null, behavior: false, bstate:null});
       }
       break;
@@ -239,7 +235,7 @@ handleClick(name) {
     break;
     case "archive":
     this.setState({generator:[false,null], tinfo:[false,null], archive:[true,"active"]});
-    alert("Archive is not yet an active feature. Stay Tuned!");
+    // alert("Archive is not yet an active feature. Stay Tuned!");
     break;
     case "hit":
     if(hitstate[2]){
@@ -410,224 +406,742 @@ handleClick(name) {
     case "tap1":
     this.setState({place:tapplace,cut:tapcut,up:tapup,acttact:[tap,tapstate[3],tapstate[4],"Tap"],hit1:[false,null,hitstate[2],hitstate[3],hitstate[4]], pat1:[false,null,patstate[2],patstate[3],patstate[4]], push1:[false,null,pushstate[2],pushstate[3],pushstate[4]], rub1:[false,null,rubstate[2],rubstate[3],rubstate[4]],shake1:[false,null,shakestate[2],shakestate[3],shakestate[4]],squeeze1:[false,null,squeezestate[2],squeezestate[3],squeezestate[4]],stroke1:[false,null,strokestate[2],strokestate[3],strokestate[4]],tap1:[true,"active",tapstate[2],tapstate[3],tapstate[4]],});
     break;
+    case "save2archive":
+
+    var formdata = new FormData();
+
+    formdata.append("name", this.state.fileName);
+    formdata.append("emotion", this.state.ename);
+    formdata.append("tactor", this.state.tname);
+    formdata.append("touch_range", document.getElementById("touch-range").value);
+    formdata.append("touch_speed", document.getElementById("speed-touch").value);
+    formdata.append("retreat_speed", document.getElementById("speed-retreat").value);
+    formdata.append("touch_random", document.getElementById("touch-randomness").value);
+    formdata.append("touch_interval", document.getElementById("touch-interval").value);
+    formdata.append("interval_random", document.getElementById("interval-randomness").value);
+
+    var requestOptions = {
+      method: 'POST',
+      body: formdata,
+      redirect: 'follow'
+    };
+
+    fetch('https://akshaybaweja.com/ran/api.php/archive/' + this.state.username, requestOptions)
+      .then(response => response.json())
+      .then(data => data.response==="success"?alert("Saved Successfully"):alert("Error while saving"))
+      .then(() => this.getArchiveData());
+    break;
+    default: console.log("handleClick: defaultState");
   }
 }
 
-
-activate(name){
-  var hitstate=this.state.hit1;
-  var patstate=this.state.pat1;
-  var pushstate=this.state.push1;
-  var rubstate=this.state.rub1;
-  var shakestate=this.state.shake1;
-  var squeezestate=this.state.squeeze1;
-  var strokestate=this.state.stroke1;
-  var tapstate=this.state.tap1;
-  switch(name){
-  case "Hit":
-  this.setState({hit1:[hitstate[0],hitstate[1],true,hitstate[3],hitstate[4]]});
-  break;
-  case "Pat":
-  this.setState({pat1:[patstate[0],patstate[1],true,patstate[3],patstate[4]]});
-  break;
-  case "Push":
-  this.setState({push1:[pushstate[0],pushstate[1],true,pushstate[3],pushstate[4]]});
-  break;
-  case "Rub":
-  this.setState({rub1:[rubstate[0],rubstate[1],true,rubstate[3],rubstate[4]]});
-  break;
-  case "Shake":
-  this.setState({shake1:[shakestate[0],shakestate[1],true,shakestate[3],shakestate[4]]});
-  break;
-  case "Squeeze":
-  this.setState({squeeze1:[squeezestate[0],squeezestate[1],true,squeezestate[3],squeezestate[4]]});
-  break;
-  case "Stroke":
-  this.setState({stroke1:[strokestate[0],strokestate[1],true,strokestate[3],strokestate[4]]});
-  break;
-  case "Tap":
-  this.setState({tap1:[tapstate[0],tapstate[1],true,tapstate[3],tapstate[4]]});
-  break;
-}
-alert(name + " was activated!")
-}
-
-emotionSelect(name){
-this.setState({eselected:true});
-let tname = this.state.tname;
-  switch (name) {
-    case "happiness":
-      this.setState({eicon:happiness, ename: "Happiness", shake:"suggested", squeeze: "suggested",hit: null,pat: null,push: null,rub: null,stroke: null,tap: null,});
-      if(tname!=null){
-        this.tactorSelect(tname.toLowerCase(), "happiness");
-      }
+isActive(name) {
+  let status = false;
+  switch (name.toLowerCase()) {
+    case "hit":
+      status = this.state.hit1[2];
       break;
-    case "fear":
-        this.setState({eicon:fear, ename: "Fear", shake:"suggested", squeeze: "suggested",hit: null,pat: null,push: null,rub: null,stroke: null,tap: null,});
-        if(tname!=null){
-        this.tactorSelect(tname.toLowerCase(), "fear");
-      }
+    case "pat":
+      status = this.state.pat1[2];
+      break;
+    case "push":
+      status = this.state.push1[2];
+      break;
+    case "rub":
+      status =this.state.rub1[2];
+      break;
+    case "shake":
+      status = this.state.shake1[2];
+      break;
+    case "squeeze":
+      status = this.state.squeeze1[2];
+      break;
+    case "stroke":
+      status = this.state.stroke1[2];
+      break;
+    case "tap":
+      status = this.state.tap1[2];
+      break;
+    default:
+      status = false;
+      console.log(">isActive: default", name);
+  }
+  return status;
+}
+
+activate(name, callback = () => {}) {
+  if (!this.isActive(name)) {
+    var hitstate = this.state.hit1;
+    var patstate = this.state.pat1;
+    var pushstate = this.state.push1;
+    var rubstate = this.state.rub1;
+    var shakestate = this.state.shake1;
+    var squeezestate = this.state.squeeze1;
+    var strokestate = this.state.stroke1;
+    var tapstate = this.state.tap1;
+
+    switch (name) {
+      case "Hit":
+        this.setState({
+          hit1: [hitstate[0], hitstate[1], true, hitstate[3], hitstate[4]]
+        }, callback);
         break;
-    case "sympathy":
-        this.setState({eicon: sympathy, ename: "Sympathy",shake:"suggested", squeeze: null,hit: null,pat: "suggested",push: null,rub: "suggested",stroke: "suggested",tap: null,});
-        if(tname!=null){
-        this.tactorSelect(tname.toLowerCase(), "sympathy");
-      }
+      case "Pat":
+        this.setState({
+          pat1: [patstate[0], patstate[1], true, patstate[3], patstate[4]]
+        }, callback);
         break;
-    case "sadness":
-      this.setState({eicon: sadness, ename: "Sadness", shake:"suggested", squeeze: "suggested",hit: null,pat: "suggested",push:"suggested",rub: null,stroke: "suggested",tap: null,});
-      if(tname!=null){
+      case "Push":
+        this.setState({
+          push1: [pushstate[0], pushstate[1], true, pushstate[3], pushstate[4]]
+        }, callback);
+        break;
+      case "Rub":
+        this.setState({
+          rub1: [rubstate[0], rubstate[1], true, rubstate[3], rubstate[4]]
+        }, callback);
+        break;
+      case "Shake":
+        this.setState({
+          shake1: [shakestate[0], shakestate[1], true, shakestate[3], shakestate[4]]
+        }, callback);
+        break;
+      case "Squeeze":
+        this.setState({
+          squeeze1: [squeezestate[0], squeezestate[1], true, squeezestate[3], squeezestate[4]]
+        }, callback);
+        break;
+      case "Stroke":
+        this.setState({
+          stroke1: [strokestate[0], strokestate[1], true, strokestate[3], strokestate[4]]
+        }, callback);
+        break;
+      case "Tap":
+        this.setState({
+          tap1: [tapstate[0], tapstate[1], true, tapstate[3], tapstate[4]]
+        }, callback);
+        break;
+      default:
+        console.log("activate: defaultState", name);
+    }
+    alert(name + " was activated!");
+  } else {
+    callback();
+  }
+}
+
+deactivate(name, callback = () => {}) {
+    if (this.isActive(name)) {
+      var hitstate = this.state.hit1;
+      var patstate = this.state.pat1;
+      var pushstate = this.state.push1;
+      var rubstate = this.state.rub1;
+      var shakestate = this.state.shake1;
+      var squeezestate = this.state.squeeze1;
+      var strokestate = this.state.stroke1;
+      var tapstate = this.state.tap1;
+  
+      switch (name) {
+        case "Hit":
+          this.setState({
+            hit1: [hitstate[0], hitstate[1], false, hitstate[3], hitstate[4]]
+          }, callback);
+          break;
+        case "Pat":
+          this.setState({
+            pat1: [patstate[0], patstate[1], false, patstate[3], patstate[4]]
+          }, callback);
+          break;
+        case "Push":
+          this.setState({
+            push1: [pushstate[0], pushstate[1], false, pushstate[3], pushstate[4]]
+          }, callback);
+          break;
+        case "Rub":
+          this.setState({
+            rub1: [rubstate[0], rubstate[1], false, rubstate[3], rubstate[4]]
+          }, callback);
+          break;
+        case "Shake":
+          this.setState({
+            shake1: [shakestate[0], shakestate[1], false, shakestate[3], shakestate[4]]
+          }, callback);
+          break;
+        case "Squeeze":
+          this.setState({
+            squeeze1: [squeezestate[0], squeezestate[1], false, squeezestate[3], squeezestate[4]]
+          }, callback);
+          break;
+        case "Stroke":
+          this.setState({
+            stroke1: [strokestate[0], strokestate[1], false, strokestate[3], strokestate[4]]
+          }, callback);
+          break;
+        case "Tap":
+          this.setState({
+            tap1: [tapstate[0], tapstate[1], false, tapstate[3], tapstate[4]]
+          }, callback);
+          break;
+        default:
+          console.log("activate: defaultState", name);
+      }
+      alert(name + " was deactivated!");
+    } else {
+      callback();
+    }
+}
+
+emotionSelect(name, callback = () => {}){
+this.setState({
+  eselected: true
+});
+let tname = this.state.tname;
+switch (name) {
+  case "happiness":
+    this.setState({
+      eicon: happiness,
+      ename: "Happiness",
+      shake: "suggested",
+      squeeze: "suggested",
+      hit: null,
+      pat: null,
+      push: null,
+      rub: null,
+      stroke: null,
+      tap: null,
+    }, callback);
+    if (tname != null) {
+      this.tactorSelect(tname.toLowerCase(), "happiness");
+    }
+    break;
+  case "fear":
+    this.setState({
+      eicon: fear,
+      ename: "Fear",
+      shake: "suggested",
+      squeeze: "suggested",
+      hit: null,
+      pat: null,
+      push: null,
+      rub: null,
+      stroke: null,
+      tap: null,
+    }, callback);
+    if (tname != null) {
+      this.tactorSelect(tname.toLowerCase(), "fear");
+    }
+    break;
+  case "sympathy":
+    this.setState({
+      eicon: sympathy,
+      ename: "Sympathy",
+      shake: "suggested",
+      squeeze: null,
+      hit: null,
+      pat: "suggested",
+      push: null,
+      rub: "suggested",
+      stroke: "suggested",
+      tap: null,
+    }, callback);
+    if (tname != null) {
+      this.tactorSelect(tname.toLowerCase(), "sympathy");
+    }
+    break;
+  case "sadness":
+    this.setState({
+      eicon: sadness,
+      ename: "Sadness",
+      shake: "suggested",
+      squeeze: "suggested",
+      hit: null,
+      pat: "suggested",
+      push: "suggested",
+      rub: null,
+      stroke: "suggested",
+      tap: null,
+    }, callback);
+    if (tname != null) {
       this.tactorSelect(tname.toLowerCase(), "sadness");
     }
-      break;
-    case "anger":
-      this.setState({eicon: anger, ename: "Anger", shake:null, squeeze: "suggested",hit: "suggested",pat: null,push:"suggested",rub: null,stroke: null,tap: null,});
-      if(tname!=null){
+    break;
+  case "anger":
+    this.setState({
+      eicon: anger,
+      ename: "Anger",
+      shake: null,
+      squeeze: "suggested",
+      hit: "suggested",
+      pat: null,
+      push: "suggested",
+      rub: null,
+      stroke: null,
+      tap: null,
+    }, callback);
+    if (tname != null) {
       this.tactorSelect(tname.toLowerCase(), "anger");
     }
-      break;
-    case "disgust":
-      this.setState({eicon: disgust, ename:"Disgust", shake:null, squeeze: null,hit: null,pat: null,push: "suggested",rub: null,stroke: null,tap: null,});
-      if(tname!=null){
+    break;
+  case "disgust":
+    this.setState({
+      eicon: disgust,
+      ename: "Disgust",
+      shake: null,
+      squeeze: null,
+      hit: null,
+      pat: null,
+      push: "suggested",
+      rub: null,
+      stroke: null,
+      tap: null,
+    }, callback);
+    if (tname != null) {
       this.tactorSelect(tname.toLowerCase(), "disgust");
     }
-      break;
-    case "love":
-      this.setState({eicon: love, ename: "Love", shake:"suggested", squeeze: "suggested",hit: null,pat: "suggested",push: null,rub: "suggested",stroke: "suggested",tap: null,});
-      if(tname!=null){
+    break;
+  case "love":
+    this.setState({
+      eicon: love,
+      ename: "Love",
+      shake: "suggested",
+      squeeze: "suggested",
+      hit: null,
+      pat: "suggested",
+      push: null,
+      rub: "suggested",
+      stroke: "suggested",
+      tap: null,
+    }, callback);
+    if (tname != null) {
       this.tactorSelect(tname.toLowerCase(), "love");
     }
-      break;
-    case "gratitude":
-      this.setState({eicon: gratitude, ename:"Gratitude", shake:"suggested", squeeze: "suggested",hit: null,pat: "suggested",push: null,rub: null,stroke: null,tap: "suggested",});
-      if(tname!=null){
+    break;
+  case "gratitude":
+    this.setState({
+      eicon: gratitude,
+      ename: "Gratitude",
+      shake: "suggested",
+      squeeze: "suggested",
+      hit: null,
+      pat: "suggested",
+      push: null,
+      rub: null,
+      stroke: null,
+      tap: "suggested",
+    }, callback);
+    if (tname != null) {
       this.tactorSelect(tname.toLowerCase(), "gratitude");
     }
-      break;
-  }
+    break;
+  default:
+    console.log("emotionSelect: defaultState", name);
+}
 }
 
-tactorSelect(name, ename){
-this.setState({tselected:true});
+tactorSelect(name, ename, callback = () => {}) {
+
+  this.setState({
+    tselected: true
+  });
 
 
-var tr = [0,180]; //touch range slider max and min
-var trr = 100/(tr[1]-tr[0]);
-var ts = [0,360]; //touch speed slider max and min
-var tsr = 100/(ts[1]-ts[0]);
-var rs = [0,360]; //retreat speed slider max and min
-var rsr = 100/(rs[1]-rs[0]);
-var rand = [0,50]; //touch randomness max and min
-var randr = 100/(rand[1]-rand[0]);
-var ti = [0,1000]; //touch interval max and min
-var tir = 100/(ti[1]-ti[0]);
-var ir = [0,300] // interval randomness max and min
-var irr = 100/(ir[1]-ir[0]);
-
-
+  var tr = [0, 180]; //touch range slider max and min
+  var trr = 100 / (tr[1] - tr[0]);
+  var ts = [0, 360]; //touch speed slider max and min
+  var tsr = 100 / (ts[1] - ts[0]);
+  var rs = [0, 360]; //retreat speed slider max and min
+  var rsr = 100 / (rs[1] - rs[0]);
+  var rand = [0, 50]; //touch randomness max and min
+  var randr = 100 / (rand[1] - rand[0]);
+  var ti = [0, 1000]; //touch interval max and min
+  var tir = 100 / (ti[1] - ti[0]);
+  var ir = [0, 300] // interval randomness max and min
+  var irr = 100 / (ir[1] - ir[0]);
 
   switch (name.toLowerCase()) {
+
     case "shake":
-    this.serialmsg[0]=5;
-      this.setState({ticon:shake, tname: "Shake" ,happiness:"suggested", fear:null,sympathy:"suggested",sadness:"suggested",anger: null,disgust: null,love: "suggested",gratitude:"suggested",});
-      if(ename!=null){
-      if (ename.toLowerCase() === "gratitude") {
-          this.setState({trange:[40,20*trr,50*trr], tspeed:[125,90*tsr,160*tsr], rspeed:[90,85*rsr,105*rsr], randomness:[12,4*randr,20*randr], tint: [200,165*tir,270*tir], irand:[27,0*irr,87*irr],});
-        }else if(ename.toLowerCase() === "happiness"){
-          this.setState({trange:[40,30*trr,60*trr], tspeed:[108,96*tsr,136*tsr], rspeed:[105,84*rsr,108*rsr], randomness:[5,0*randr,15*randr], tint: [160,120*tir,240*tir], irand:[0,0*irr,10*irr],});
-        }else if(ename.toLowerCase() === "sadness"){
-          this.setState({trange:[40,30*trr,40*trr], tspeed:[35,30*tsr,35*tsr], rspeed:[48,40*rsr,54*rsr], randomness:[5,2*randr,8*randr], tint: [265,247*tir,282*tir], irand:[0,0*irr,0*irr],});
-        }else if(ename.toLowerCase() === "sympathy"){
-          this.setState({trange:[30,20*trr,40*trr], tspeed:[36,30*tsr,66*tsr], rspeed:[24,24*rsr,66*rsr], randomness:[0,0*randr,5*randr], tint:[50,25*tir,525*tir], irand:[0,0*irr,20*irr],});
-        }else if(ename.toLowerCase() === "love"){
-          this.setState({trange:[60,40*trr,70*trr], tspeed:[48,33*tsr,70*tsr], rspeed:[60,50*rsr,66*rsr], randomness:[2,0*randr,5*randr], tint:[40,7*tir,252*tir], irand:[16,9*irr,22*irr],});
-        }else{
-          this.setState({trange:[0,0*trr,0*trr], tspeed:[0,0*tsr,0*tsr], rspeed:[0,0*rsr,0*rsr], randomness:[0,0*randr,0*randr], tint: [0,0*tir,0*tir], irand:[0,0*irr,0*irr],});
+      this.serialmsg[0] = 5;
+      this.setState({
+        ticon: shake,
+        tname: "Shake",
+        happiness: "suggested",
+        fear: null,
+        sympathy: "suggested",
+        sadness: "suggested",
+        anger: null,
+        disgust: null,
+        love: "suggested",
+        gratitude: "suggested",
+      });
+      if (ename != null) {
+        if (ename.toLowerCase() === "gratitude") {
+          this.setState({
+            trange: [40, 20 * trr, 50 * trr],
+            tspeed: [125, 90 * tsr, 160 * tsr],
+            rspeed: [90, 85 * rsr, 105 * rsr],
+            randomness: [12, 4 * randr, 20 * randr],
+            tint: [200, 165 * tir, 270 * tir],
+            irand: [27, 0 * irr, 87 * irr],
+          }, callback);
+        } else if (ename.toLowerCase() === "happiness") {
+          this.setState({
+            trange: [40, 30 * trr, 60 * trr],
+            tspeed: [108, 96 * tsr, 136 * tsr],
+            rspeed: [105, 84 * rsr, 108 * rsr],
+            randomness: [5, 0 * randr, 15 * randr],
+            tint: [160, 120 * tir, 240 * tir],
+            irand: [0, 0 * irr, 10 * irr],
+          }, callback);
+        } else if (ename.toLowerCase() === "sadness") {
+          this.setState({
+            trange: [40, 30 * trr, 40 * trr],
+            tspeed: [35, 30 * tsr, 35 * tsr],
+            rspeed: [48, 40 * rsr, 54 * rsr],
+            randomness: [5, 2 * randr, 8 * randr],
+            tint: [265, 247 * tir, 282 * tir],
+            irand: [0, 0 * irr, 0 * irr],
+          }, callback);
+        } else if (ename.toLowerCase() === "sympathy") {
+          this.setState({
+            trange: [30, 20 * trr, 40 * trr],
+            tspeed: [36, 30 * tsr, 66 * tsr],
+            rspeed: [24, 24 * rsr, 66 * rsr],
+            randomness: [0, 0 * randr, 5 * randr],
+            tint: [50, 25 * tir, 525 * tir],
+            irand: [0, 0 * irr, 20 * irr],
+          }, callback);
+        } else if (ename.toLowerCase() === "love") {
+          this.setState({
+            trange: [60, 40 * trr, 70 * trr],
+            tspeed: [48, 33 * tsr, 70 * tsr],
+            rspeed: [60, 50 * rsr, 66 * rsr],
+            randomness: [2, 0 * randr, 5 * randr],
+            tint: [40, 7 * tir, 252 * tir],
+            irand: [16, 9 * irr, 22 * irr],
+          }, callback);
+        } else {
+          this.setState({
+            trange: [0, 0 * trr, 0 * trr],
+            tspeed: [0, 0 * tsr, 0 * tsr],
+            rspeed: [0, 0 * rsr, 0 * rsr],
+            randomness: [0, 0 * randr, 0 * randr],
+            tint: [0, 0 * tir, 0 * tir],
+            irand: [0, 0 * irr, 0 * irr],
+          }, callback);
         }
       }
       break;
     case "squeeze":
-      this.serialmsg[0]=6;
-        this.setState({ticon:squeeze, tname: "Squeeze",happiness:"suggested", fear:"suggested",sympathy:null,sadness:"suggested",anger: "suggested",disgust: null,love: "suggested",gratitude: "suggested",});
-        if(ename!=null){
+      this.serialmsg[0] = 6;
+      this.setState({
+        ticon: squeeze,
+        tname: "Squeeze",
+        happiness: "suggested",
+        fear: "suggested",
+        sympathy: null,
+        sadness: "suggested",
+        anger: "suggested",
+        disgust: null,
+        love: "suggested",
+        gratitude: "suggested",
+      });
+      if (ename != null) {
         if (ename.toLowerCase() === "anger") {
-            this.setState({trange:[60,60*trr,60*trr], tspeed:[285,257*tsr,315*tsr], rspeed:[120,99*rsr,153*rsr], randomness:[17,13*randr,21*randr], tint: [135,117*tir,152*tir], irand:[97,83*irr,111*irr],});
-          }else if(ename.toLowerCase() === "fear"){
-            this.setState({trange:[40,20*trr,40*trr], tspeed:[165,105*tsr,204*tsr], rspeed:[120,72*rsr,156*rsr], randomness:[10,10*randr,25*randr], tint: [160,50*tir,250*tir], irand:[30,0*irr,60*irr],});
-          }else if(ename.toLowerCase() === "gratitude"){
-            this.setState({trange:[50,40*trr,50*trr], tspeed:[82,70*tsr,94*tsr], rspeed:[60,50*rsr,70*rsr], randomness:[8,4*randr,11*randr], tint: [635,467*tir,802*tir], irand:[25,12*irr,40*irr],});
-          }else if(ename.toLowerCase() === "happiness"){
-            this.setState({trange:[70,60*trr,80*trr], tspeed:[133,132*tsr,135*tsr], rspeed:[144,126*rsr,162*rsr], randomness:[12,8*randr,16*randr], tint:[50,25*tir,75*tir], irand:[0,0*irr,0*irr],});
-          }else if(ename.toLowerCase() === "love"){
-            this.setState({trange:[70,50*trr,90*trr], tspeed:[72,72*tsr,72*tsr], rspeed:[48,42*rsr,54*rsr], randomness:[0,0*randr,5*randr], tint: [10,5*tir,155*tir], irand:[0,0*irr,24*irr],});
-          }else{
-            this.setState({trange:[0,0*trr,0*trr], tspeed:[0,0*tsr,0*tsr], rspeed:[0,0*rsr,0*rsr], randomness:[0,0*randr,0*randr], tint: [0,0*tir,0*tir], irand:[0,0*irr,0*irr],});
-          }
+          this.setState({
+            trange: [60, 60 * trr, 60 * trr],
+            tspeed: [285, 257 * tsr, 315 * tsr],
+            rspeed: [120, 99 * rsr, 153 * rsr],
+            randomness: [17, 13 * randr, 21 * randr],
+            tint: [135, 117 * tir, 152 * tir],
+            irand: [97, 83 * irr, 111 * irr],
+          }, callback);
+        } else if (ename.toLowerCase() === "fear") {
+          this.setState({
+            trange: [40, 20 * trr, 40 * trr],
+            tspeed: [165, 105 * tsr, 204 * tsr],
+            rspeed: [120, 72 * rsr, 156 * rsr],
+            randomness: [10, 10 * randr, 25 * randr],
+            tint: [160, 50 * tir, 250 * tir],
+            irand: [30, 0 * irr, 60 * irr],
+          }, callback);
+        } else if (ename.toLowerCase() === "gratitude") {
+          this.setState({
+            trange: [50, 40 * trr, 50 * trr],
+            tspeed: [82, 70 * tsr, 94 * tsr],
+            rspeed: [60, 50 * rsr, 70 * rsr],
+            randomness: [8, 4 * randr, 11 * randr],
+            tint: [635, 467 * tir, 802 * tir],
+            irand: [25, 12 * irr, 40 * irr],
+          }, callback);
+        } else if (ename.toLowerCase() === "happiness") {
+          this.setState({
+            trange: [70, 60 * trr, 80 * trr],
+            tspeed: [133, 132 * tsr, 135 * tsr],
+            rspeed: [144, 126 * rsr, 162 * rsr],
+            randomness: [12, 8 * randr, 16 * randr],
+            tint: [50, 25 * tir, 75 * tir],
+            irand: [0, 0 * irr, 0 * irr],
+          }, callback);
+        } else if (ename.toLowerCase() === "love") {
+          this.setState({
+            trange: [70, 50 * trr, 90 * trr],
+            tspeed: [72, 72 * tsr, 72 * tsr],
+            rspeed: [48, 42 * rsr, 54 * rsr],
+            randomness: [0, 0 * randr, 5 * randr],
+            tint: [10, 5 * tir, 155 * tir],
+            irand: [0, 0 * irr, 24 * irr],
+          }, callback);
+        } else {
+          this.setState({
+            trange: [0, 0 * trr, 0 * trr],
+            tspeed: [0, 0 * tsr, 0 * tsr],
+            rspeed: [0, 0 * rsr, 0 * rsr],
+            randomness: [0, 0 * randr, 0 * randr],
+            tint: [0, 0 * tir, 0 * tir],
+            irand: [0, 0 * irr, 0 * irr],
+          }, callback);
         }
-        break;
+      }
+      break;
     case "hit":
-      this.serialmsg[0]=2;
-        this.setState({ticon: hit, tname: "Hit" ,happiness:null, fear:null,sympathy:null,sadness:null,anger: "anger",disgust: null,love: null,gratitude: null,});
-        if(ename!=null){
+      this.serialmsg[0] = 2;
+      this.setState({
+        ticon: hit,
+        tname: "Hit",
+        happiness: null,
+        fear: null,
+        sympathy: null,
+        sadness: null,
+        anger: "anger",
+        disgust: null,
+        love: null,
+        gratitude: null,
+      });
+      if (ename != null) {
         if (ename.toLowerCase() === "anger") {
-            this.setState({trange:[70,30*trr,70*trr], tspeed:[225,198*tsr,258*tsr], rspeed:[90,66*rsr,132*rsr], randomness:[5,0*randr,5*randr], tint: [280,170*tir,290*tir], irand:[0,0*irr,40*irr],});
-          }else{
-            this.setState({trange:[0,0*trr,0*trr], tspeed:[0,0*tsr,0*tsr], rspeed:[0,0*rsr,0*rsr], randomness:[0,0*randr,0*randr], tint: [0,0*tir,0*tir], irand:[0,0*irr,0*irr],});
-          }
+          this.setState({
+            trange: [70, 30 * trr, 70 * trr],
+            tspeed: [225, 198 * tsr, 258 * tsr],
+            rspeed: [90, 66 * rsr, 132 * rsr],
+            randomness: [5, 0 * randr, 5 * randr],
+            tint: [280, 170 * tir, 290 * tir],
+            irand: [0, 0 * irr, 40 * irr],
+          }, callback);
+        } else {
+          this.setState({
+            trange: [0, 0 * trr, 0 * trr],
+            tspeed: [0, 0 * tsr, 0 * tsr],
+            rspeed: [0, 0 * rsr, 0 * rsr],
+            randomness: [0, 0 * randr, 0 * randr],
+            tint: [0, 0 * tir, 0 * tir],
+            irand: [0, 0 * irr, 0 * irr],
+          }, callback);
         }
-        break;
+      }
+      break;
     case "pat":
-      this.serialmsg[0]=2;
-      this.setState({ticon: pat, tname: "Pat",happiness:null, fear:null,sympathy:"suggested",sadness:"suggested",anger: null,disgust: null,love: "suggested",gratitude: "suggested",});
-      if(ename!=null){
-      if (ename.toLowerCase() === "gratitude") {
-          this.setState({trange:[50,40*trr,50*trr], tspeed:[82,70*tsr,94*tsr], rspeed:[60,50*rsr,70*rsr], randomness:[8,4*randr,15*randr], tint: [635,467*tir,802*tir], irand:[25,12*irr,38*irr],});
-        }else if(ename.toLowerCase() === "love"){
-          this.setState({trange:[60,40*trr,60*trr], tspeed:[90,87*tsr,93*tsr], rspeed:[48,46*rsr,48*rsr], randomness:[0,0*randr,5*randr], tint: [280,255*tir,375*tir], irand:[0,0*irr,0*irr],});
-        }else if(ename.toLowerCase() === "sadness"){
-          this.setState({trange:[40,30*trr,60*trr], tspeed:[50,30*tsr,71*tsr], rspeed:[42,27*rsr,57*rsr], randomness:[2,0*randr,9*randr], tint: [320,262*tir,422*tir], irand:[15,0*irr,52*irr],});
-        }else if(ename.toLowerCase() === "sympathy"){
-          this.setState({trange:[40,30*trr,50*trr], tspeed:[36,30*tsr,63*tsr], rspeed:[33,25*rsr,45*rsr], randomness:[12,8*randr,16*randr], tint:[50,25*tir,75*tir], irand:[0,0*irr,0*irr],});
-        }else{
-          this.setState({trange:[0,0*trr,0*trr], tspeed:[0,0*tsr,0*tsr], rspeed:[0,0*rsr,0*rsr], randomness:[0,0*randr,0*randr], tint: [0,0*tir,0*tir], irand:[0,0*irr,0*irr],});
-        }}
+      this.serialmsg[0] = 2;
+      this.setState({
+        ticon: pat,
+        tname: "Pat",
+        happiness: null,
+        fear: null,
+        sympathy: "suggested",
+        sadness: "suggested",
+        anger: null,
+        disgust: null,
+        love: "suggested",
+        gratitude: "suggested",
+      });
+      if (ename != null) {
+        if (ename.toLowerCase() === "gratitude") {
+          this.setState({
+            trange: [50, 40 * trr, 50 * trr],
+            tspeed: [82, 70 * tsr, 94 * tsr],
+            rspeed: [60, 50 * rsr, 70 * rsr],
+            randomness: [8, 4 * randr, 15 * randr],
+            tint: [635, 467 * tir, 802 * tir],
+            irand: [25, 12 * irr, 38 * irr],
+          }, callback);
+        } else if (ename.toLowerCase() === "love") {
+          this.setState({
+            trange: [60, 40 * trr, 60 * trr],
+            tspeed: [90, 87 * tsr, 93 * tsr],
+            rspeed: [48, 46 * rsr, 48 * rsr],
+            randomness: [0, 0 * randr, 5 * randr],
+            tint: [280, 255 * tir, 375 * tir],
+            irand: [0, 0 * irr, 0 * irr],
+          }, callback);
+        } else if (ename.toLowerCase() === "sadness") {
+          this.setState({
+            trange: [40, 30 * trr, 60 * trr],
+            tspeed: [50, 30 * tsr, 71 * tsr],
+            rspeed: [42, 27 * rsr, 57 * rsr],
+            randomness: [2, 0 * randr, 9 * randr],
+            tint: [320, 262 * tir, 422 * tir],
+            irand: [15, 0 * irr, 52 * irr],
+          }, callback);
+        } else if (ename.toLowerCase() === "sympathy") {
+          this.setState({
+            trange: [40, 30 * trr, 50 * trr],
+            tspeed: [36, 30 * tsr, 63 * tsr],
+            rspeed: [33, 25 * rsr, 45 * rsr],
+            randomness: [12, 8 * randr, 16 * randr],
+            tint: [50, 25 * tir, 75 * tir],
+            irand: [0, 0 * irr, 0 * irr],
+          }, callback);
+        } else {
+          this.setState({
+            trange: [0, 0 * trr, 0 * trr],
+            tspeed: [0, 0 * tsr, 0 * tsr],
+            rspeed: [0, 0 * rsr, 0 * rsr],
+            randomness: [0, 0 * randr, 0 * randr],
+            tint: [0, 0 * tir, 0 * tir],
+            irand: [0, 0 * irr, 0 * irr],
+          }, callback);
+        }
+      }
       break;
     case "push":
-      this.serialmsg[0]=3;
-      this.setState({ticon: push, tname: "Push",happiness:null, fear:null,sympathy:null,sadness:"suggested",anger: "suggested",disgust: "suggested",love: null,gratitude: null,});
-      if(ename!=null){
-      if (ename.toLowerCase() === "anger") {
-          this.setState({trange:[60,50*trr,70*trr], tspeed:[105,96*tsr,144*tsr], rspeed:[120,84*rsr,144*rsr], randomness:[10,0*randr,15*randr], tint: [0,0*tir,300*tir], irand:[0,0*irr,70*irr],});
-        }else if(ename.toLowerCase() === "disgust"){
-          this.setState({trange:[40,30*trr,50*trr], tspeed:[105,30*tsr,168*tsr], rspeed:[70,60*rsr,90*rsr], randomness:[0,0*randr,25*randr], tint: [220,50*tir,370*tir], irand:[0,0*irr,65*irr],});
-        }else if(ename.toLowerCase() == "sadness"){
-          this.setState({trange:[50,40*trr,50*trr], tspeed:[54,39*tsr,70*tsr], rspeed:[66,57*rsr,75*rsr], randomness:[5,5*randr,5*randr], tint: [390,230*tir,550*tir], irand:[50,45*irr,55*irr],});
-        }else{
-          this.setState({trange:[0,0*trr,0*trr], tspeed:[0,0*tsr,0*tsr], rspeed:[0,0*rsr,0*rsr], randomness:[0,0*randr,0*randr], tint: [0,0*tir,0*tir], irand:[0,0*irr,0*irr],});
-        }}
+      this.serialmsg[0] = 3;
+      this.setState({
+        ticon: push,
+        tname: "Push",
+        happiness: null,
+        fear: null,
+        sympathy: null,
+        sadness: "suggested",
+        anger: "suggested",
+        disgust: "suggested",
+        love: null,
+        gratitude: null,
+      });
+      if (ename != null) {
+        if (ename.toLowerCase() === "anger") {
+          this.setState({
+            trange: [60, 50 * trr, 70 * trr],
+            tspeed: [105, 96 * tsr, 144 * tsr],
+            rspeed: [120, 84 * rsr, 144 * rsr],
+            randomness: [10, 0 * randr, 15 * randr],
+            tint: [0, 0 * tir, 300 * tir],
+            irand: [0, 0 * irr, 70 * irr],
+          }, callback);
+        } else if (ename.toLowerCase() === "disgust") {
+          this.setState({
+            trange: [40, 30 * trr, 50 * trr],
+            tspeed: [105, 30 * tsr, 168 * tsr],
+            rspeed: [70, 60 * rsr, 90 * rsr],
+            randomness: [0, 0 * randr, 25 * randr],
+            tint: [220, 50 * tir, 370 * tir],
+            irand: [0, 0 * irr, 65 * irr],
+          }, callback);
+        } else if (ename.toLowerCase() === "sadness") {
+          this.setState({
+            trange: [50, 40 * trr, 50 * trr],
+            tspeed: [54, 39 * tsr, 70 * tsr],
+            rspeed: [66, 57 * rsr, 75 * rsr],
+            randomness: [5, 5 * randr, 5 * randr],
+            tint: [390, 230 * tir, 550 * tir],
+            irand: [50, 45 * irr, 55 * irr],
+          }, callback);
+        } else {
+          this.setState({
+            trange: [0, 0 * trr, 0 * trr],
+            tspeed: [0, 0 * tsr, 0 * tsr],
+            rspeed: [0, 0 * rsr, 0 * rsr],
+            randomness: [0, 0 * randr, 0 * randr],
+            tint: [0, 0 * tir, 0 * tir],
+            irand: [0, 0 * irr, 0 * irr],
+          }, callback);
+        }
+      }
       break;
     case "rub":
-      this.serialmsg[0]=4;
-      this.setState({ticon: rub, tname:"Rub",happiness:null, fear:null,sympathy:"suggested",sadness:null,anger: null,disgust: null,love: "suggested",gratitude: null,});
-      this.setState({trange:[0,0*trr,0*trr], tspeed:[0,0*tsr,0*tsr], rspeed:[0,0*rsr,0*rsr], randomness:[0,0*randr,0*randr], tint: [0,0*tir,0*tir], irand:[0,0*irr,0*irr],});
+      this.serialmsg[0] = 4;
+      this.setState({
+        ticon: rub,
+        tname: "Rub",
+        happiness: null,
+        fear: null,
+        sympathy: "suggested",
+        sadness: null,
+        anger: null,
+        disgust: null,
+        love: "suggested",
+        gratitude: null,
+      });
+      this.setState({
+        trange: [0, 0 * trr, 0 * trr],
+        tspeed: [0, 0 * tsr, 0 * tsr],
+        rspeed: [0, 0 * rsr, 0 * rsr],
+        randomness: [0, 0 * randr, 0 * randr],
+        tint: [0, 0 * tir, 0 * tir],
+        irand: [0, 0 * irr, 0 * irr],
+      }, callback);
       break;
     case "stroke":
-      this.serialmsg[0]=7;
-      this.setState({ticon: stroke, tname: "Stroke",happiness:null, fear:null,sympathy:"suggested",sadness:"suggested",anger: null,disgust: null,love: "suggested",gratitude: null,});
-      this.setState({trange:[0,0*trr,0*trr], tspeed:[0,0*tsr,0*tsr], rspeed:[0,0*rsr,0*rsr], randomness:[0,0*randr,0*randr], tint: [0,0*tir,0*tir], irand:[0,0*irr,0*irr],});
+      this.serialmsg[0] = 7;
+      this.setState({
+        ticon: stroke,
+        tname: "Stroke",
+        happiness: null,
+        fear: null,
+        sympathy: "suggested",
+        sadness: "suggested",
+        anger: null,
+        disgust: null,
+        love: "suggested",
+        gratitude: null,
+      });
+      this.setState({
+        trange: [0, 0 * trr, 0 * trr],
+        tspeed: [0, 0 * tsr, 0 * tsr],
+        rspeed: [0, 0 * rsr, 0 * rsr],
+        randomness: [0, 0 * randr, 0 * randr],
+        tint: [0, 0 * tir, 0 * tir],
+        irand: [0, 0 * irr, 0 * irr],
+      }, callback);
       break;
     case "tap":
-      this.serialmsg[0]=8;
-      this.setState({ticon: tap, tname:"Tap",happiness:null, fear:null,sympathy:null,sadness:null,anger: null,disgust: null,love: null,gratitude: "suggested",});
-      if(ename!=null){
-      if (ename.toLowerCase() === "anger") {
-          this.setState({trange:[50,40*trr,70*trr], tspeed:[125,110*tsr,140*tsr], rspeed:[85,72*rsr,90*rsr], randomness:[5,3*randr,15*randr], tint: [300,190*tir,480*tir], irand:[20,10*irr,40*irr],});
-        }else{
-          this.setState({trange:[0,0*trr,0*trr], tspeed:[0,0*tsr,0*tsr], rspeed:[0,0*rsr,0*rsr], randomness:[0,0*randr,0*randr], tint: [0,0*tir,0*tir], irand:[0,0*irr,0*irr],});
-        }}
+      this.serialmsg[0] = 8;
+      this.setState({
+        ticon: tap,
+        tname: "Tap",
+        happiness: null,
+        fear: null,
+        sympathy: null,
+        sadness: null,
+        anger: null,
+        disgust: null,
+        love: null,
+        gratitude: "suggested",
+      });
+      if (ename != null) {
+        if (ename.toLowerCase() === "anger") {
+          this.setState({
+            trange: [50, 40 * trr, 70 * trr],
+            tspeed: [125, 110 * tsr, 140 * tsr],
+            rspeed: [85, 72 * rsr, 90 * rsr],
+            randomness: [5, 3 * randr, 15 * randr],
+            tint: [300, 190 * tir, 480 * tir],
+            irand: [20, 10 * irr, 40 * irr],
+          }, callback);
+        } else {
+          this.setState({
+            trange: [0, 0 * trr, 0 * trr],
+            tspeed: [0, 0 * tsr, 0 * tsr],
+            rspeed: [0, 0 * rsr, 0 * rsr],
+            randomness: [0, 0 * randr, 0 * randr],
+            tint: [0, 0 * tir, 0 * tir],
+            irand: [0, 0 * irr, 0 * irr],
+          }, callback);
+        }
+      }
       break;
+    default:
+      console.log("tactorSelect: defaultState", name);
   }
-
 }
 
 bitshift(number){
@@ -638,10 +1152,7 @@ bitshift(number){
   reverse = reverse.replace(',','')
   console.log(parseInt(reverse,reverse.length));
   return data;
-
-
 }
-
 
 handleSlider(name){
 switch (name) {
@@ -679,8 +1190,10 @@ switch (name) {
     let irander = [this.state.irand];
     irander[0] = document.getElementById("interval-randomness").value;
     this.setState({irand:irander});
-    this.serialmsg[5] = irander[0]
+    this.serialmsg[5] = irander[0];
     break;
+    default: console.log("handleSlider: defaultState", name);
+
 }
   console.log(this.serialmsg);
   this.start(this.serialmsg);
@@ -703,36 +1216,95 @@ pp(play){
   //this.start(this.serialmsg);
 }
 
+componentDidMount(){
+  this.getArchiveData();
+}
 
+getArchiveData(){
+  return fetch('https://akshaybaweja.com/ran/api.php/archive/'+this.state.username)
+  .then(response => response.json())
+  .then(data => {
+    if (Array.isArray(data.results)) {
+      this.setState({ archiveData: data.results});
+    } else {
+      this.setState({ archiveData: []});
+    }
+  });
+}
 
+setFromArchive(item){
 
+  let routine = () => {
+    this.emotionSelect(item.emotion.toLowerCase(), () => {
+      this.tactorSelect(item.tactor.toLowerCase(), this.state.ename, () => {
 
+        let params = item.params;
 
-  render(){
+        let tranger = this.state.trange;
+        tranger[0] = params.touch_range;
+
+        let tspeeder = this.state.tspeed;
+        tspeeder[0] = params.touch_speed;
+
+        let rspeeder = this.state.rspeed;
+        rspeeder[0] = params.retreat_speed;
+
+        let rander = this.state.randomness;
+        rander[0] = params.touch_random;
+
+        let tinter = this.state.tint;
+        tinter[0] = params.touch_interval;
+
+        let irander = this.state.irand;
+        irander[0] = params.interval_random;
+
+        this.setState({
+          trange: tranger,
+          tspeed: tspeeder,
+          rspeed: rspeeder,
+          randomness: rander,
+          tint: tinter,
+          irand: irander,
+          fileName: item.name
+        }, () => {
+          this.handleClick("tgen");
+          this.handleClick("behavior");
+        });
+      });
+    });
+  }
+
+  if (window.confirm("The required tactor is not activated.\nDo you want to activate it now?")) {
+    this.handleClick("tinfo");
+    this.handleClick(item.tactor.toLowerCase() + '1');
+  } else {
+    routine();
+  }
+}
+
+render(){
 
 //console.log(this.bitshift(400));
-
-
 
   return(
     <div>
     <nav className="navbar top-nav navbar-expand navbar-light bg-white ">
-  <h6 className="navbar-brand" onClick={() => this.handleClick("tbots")}>Tactor Bots</h6>
+      <h6 className="navbar-brand" onClick={() => this.handleClick("tbots")}>TactorBots</h6>
 
-  <div className="navbar-collapse" id="navbarSupportedContent">
-    <ul className="top-nav navbar-nav mr-auto ml-auto d-flex align-content-center">
-      <li className={"top-nav nav-item active text-center "+ this.state.generator[1]}>
-        <a className= {"top-nav nav-link " + this.state.generator[1]}   onClick={() => this.handleClick("tgen")}>Touch Generator{this.state.generator[0]&&(<span className="sr-only">(current)</span>)}</a>
-      </li>
-      <li className={"top-nav nav-item active text-center "+ this.state.tinfo[1]}>
-        <a className={"top-nav nav-link " + this.state.tinfo[1]}   onClick={() => this.handleClick("tinfo")}>Tactor Information{this.state.tinfo[0]&&(<span className="sr-only">(current)</span>)}</a>
-      </li>
-      <li className={"top-nav nav-item active text-center "+ this.state.archive[1]}>
-        <a className={"top-nav nav-link " + this.state.archive[1]}    onClick={() => this.handleClick("archive")}>Archive{this.state.archive[0]&&(<span className="sr-only">(current)</span>)}</a>
-      </li>
-    </ul>
+      <div className="navbar-collapse" id="navbarSupportedContent">
+        <ul className="top-nav navbar-nav mr-auto ml-auto d-flex align-content-center">
+          <li className={"top-nav nav-item active text-center "+ this.state.generator[1]}>
+            <a className= {"top-nav nav-link " + this.state.generator[1]}   onClick={() => this.handleClick("tgen")}>Touch Generator{this.state.generator[0]&&(<span className="sr-only">(current)</span>)}</a>
+          </li>
+          <li className={"top-nav nav-item active text-center "+ this.state.tinfo[1]}>
+            <a className={"top-nav nav-link " + this.state.tinfo[1]}   onClick={() => this.handleClick("tinfo")}>Tactor Information{this.state.tinfo[0]&&(<span className="sr-only">(current)</span>)}</a>
+          </li>
+          <li className={"top-nav nav-item active text-center "+ this.state.archive[1]}>
+            <a className={"top-nav nav-link " + this.state.archive[1]}    onClick={() => this.handleClick("archive")}>Archive{this.state.archive[0]&&(<span className="sr-only">(current)</span>)}</a>
+          </li>
+        </ul>
 
-  </div>
+      </div>
   </nav>
 
 <section className="page-content">
@@ -741,7 +1313,7 @@ pp(play){
       {this.state.tinfo[0] &&(
         <div className="row left-nav group1 tinfo">
           <div className="col-2 bg-light  sidebar d-flex tinfo">
-            <div class ="row left-nav group1">
+            <div className ="row left-nav group1">
               <div className="col-12 left-col">
                 <nav className="navbar left-nav navbar-expand navbar-light">
                   <ul className="left-nav text-left tinfo">
@@ -862,213 +1434,221 @@ pp(play){
               </div>
             </div>
           </div>
-          <div class="col-10 main-content">
-            <section class="main-head">
-
+          
+          
+          <div className="col-10 main-content">
+            <section className="main-head">
 
               <h2>{this.state.acttact[3]} Tactor</h2>
-              <h3></h3>
 
             </section>
-            <section class="generator-table">
-              <div class="row generator justify-content-center">
-                <div class="col col-auto">
-                  <div class="row">
-                    <div class="col">
-                  <div class="bg-light tactortop-box  d-flex align-items-center">
-                  <img src={this.state.up} alt="" class="generator-logo tactortop"/>
+            
+            <section className="generator-table">
+              <div className="row generator justify-content-center">
+                <div className="col col-auto">
+                  <div className="row">
+                    <div className="col">
+                  <div className="bg-light tactortop-box  d-flex align-items-center">
+                  <img src={this.state.up} alt="" className="generator-logo tactortop"/>
                 </div>
                 </div>
               </div>
-              <div class="row">
-                <div class="col">
-              <div class="bg-light tactorside-box  d-flex align-items-center">
-              <img src={this.state.cut} alt="" class="generator-logo tactorside"/>
+              <div className="row">
+                <div className="col">
+              <div className="bg-light tactorside-box  d-flex align-items-center">
+              <img src={this.state.cut} alt="" className="generator-logo tactorside"/>
             </div>
 
-              <h4 class="d-flex justify-content-center text-center mx-auto tactoroverview">Tactor Overview</h4>
+              <h4 className="d-flex justify-content-center text-center mx-auto tactoroverview">Tactor Overview</h4>
             </div>
           </div>
                 </div>
 
 
-                <div class="col col-auto">
-                  <div class="bg-light  tactorplacement-box  tactorinfo d-flex align-items-center">
-                    <img src={this.state.place} alt="" class="generator-logo tactorplacement"/>
+                <div className="col col-auto">
+                  <div className="bg-light  tactorplacement-box  tactorinfo d-flex align-items-center">
+                    <img src={this.state.place} alt="" className="generator-logo tactorplacement"/>
                   </div>
-                  <h4 class="text-center mx-auto">Tactor Placement</h4>
+                  <h4 className="text-center mx-auto">Tactor Placement</h4>
                 </div>
 
-                <div class="col col-auto">
-                  <div class="bg-light  tactorplacement-box  tactorinfo d-flex align-items-center">
+                <div className="col col-auto">
+                  <div className="bg-light  tactorplacement-box  tactorinfo d-flex align-items-center">
 
                     {this.state.hit1[0] &&(
-                      <div class="row tactor-emotion d-flex justify-items-center">
-                      <div class="col col-12 tactor-emotion">
-                      <img src={anger} alt="" class="tactor-emotion"/>
-                      <h4 class="text-center tactor-emotion">Anger</h4>
+                      <div className="row tactor-emotion d-flex justify-items-center">
+                      <div className="col col-12 tactor-emotion">
+                      <img src={anger} alt="" className="tactor-emotion"/>
+                      <h4 className="text-center tactor-emotion">Anger</h4>
                     </div>
                     </div>
                   )}
                   {this.state.tap1[0] &&(
-                    <div class="row tactor-emotion d-flex justify-items-center">
-                    <div class="col col-12 tactor-emotion">
-                    <img src={gratitude} alt="" class="tactor-emotion"/>
-                    <h4 class="text-center tactor-emotion">Gratitude</h4>
+                    <div className="row tactor-emotion d-flex justify-items-center">
+                    <div className="col col-12 tactor-emotion">
+                    <img src={gratitude} alt="" className="tactor-emotion"/>
+                    <h4 className="text-center tactor-emotion">Gratitude</h4>
                   </div>
                   </div>
                 )}
                 {this.state.stroke1[0] &&(
-                  <div class="row tactor-emotion d-flex justify-items-center">
-                  <div class="col col-7 tactor-emotion mx-auto">
-                  <img src={love} alt="" class="tactor-emotion"/>
-                  <h4 class="text-center tactor-emotion">Love</h4>
+                  <div className="row tactor-emotion d-flex justify-items-center">
+                  <div className="col col-7 tactor-emotion mx-auto">
+                  <img src={love} alt="" className="tactor-emotion"/>
+                  <h4 className="text-center tactor-emotion">Love</h4>
                 </div>
-                  <div class="w-100"></div>
-                <div class="col col-7 tactor-emotion mx-auto">
-                <img src={sympathy} alt="" class="tactor-emotion"/>
-                <h4 class="text-center tactor-emotion">Sympathy</h4>
+                  <div className="w-100"></div>
+                <div className="col col-7 tactor-emotion mx-auto">
+                <img src={sympathy} alt="" className="tactor-emotion"/>
+                <h4 className="text-center tactor-emotion">Sympathy</h4>
               </div>
-              <div class="w-100"></div>
-              <div class="col col-7 tactor-emotion mx-auto">
-              <img src={sadness} alt="" class="tactor-emotion"/>
-              <h4 class="text-center tactor-emotion">Sadness</h4>
+              <div className="w-100"></div>
+              <div className="col col-7 tactor-emotion mx-auto">
+              <img src={sadness} alt="" className="tactor-emotion"/>
+              <h4 className="text-center tactor-emotion">Sadness</h4>
             </div>
             </div>
           )}{this.state.squeeze1[0] &&(
-            <div class="row tactor-emotion d-flex justify-items-center">
-                  <div class="col col-6 tactor-emotion">
-                  <img src={fear} alt="" class="tactor-emotion"/>
-                  <h4 class="text-center tactor-emotion">Fear</h4>
+            <div className="row tactor-emotion d-flex justify-items-center">
+                  <div className="col col-6 tactor-emotion">
+                  <img src={fear} alt="" className="tactor-emotion"/>
+                  <h4 className="text-center tactor-emotion">Fear</h4>
                 </div>
-                    <div class="col col-6 tactor-emotion">
-                      <img src={love} alt="" class="tactor-emotion"/>
-                      <h4 class="text-center tactor-emotion">Love</h4>
+                    <div className="col col-6 tactor-emotion">
+                      <img src={love} alt="" className="tactor-emotion"/>
+                      <h4 className="text-center tactor-emotion">Love</h4>
                     </div>
-                    <div class="w-100"></div>
-                    <div class="col col-6 tactor-emotion">
-                    <img src={anger} alt="" class="tactor-emotion"/>
-                    <h4 class="text-center tactor-emotion">Anger</h4>
+                    <div className="w-100"></div>
+                    <div className="col col-6 tactor-emotion">
+                    <img src={anger} alt="" className="tactor-emotion"/>
+                    <h4 className="text-center tactor-emotion">Anger</h4>
                     </div>
-                    <div class="col col-6 tactor-emotion">
-                      <img src={happiness} alt="" class="tactor-emotion"/>
-                      <h4 class="text-center tactor-emotion">Happiness</h4>
+                    <div className="col col-6 tactor-emotion">
+                      <img src={happiness} alt="" className="tactor-emotion"/>
+                      <h4 className="text-center tactor-emotion">Happiness</h4>
                     </div>
-                    <div class="w-100"></div>
-                    <div class="col col-6 tactor-emotion">
-                    <img src={gratitude} alt="" class="tactor-emotion"/>
-                    <h4 class="text-center tactor-emotion">Gratitude</h4>
+                    <div className="w-100"></div>
+                    <div className="col col-6 tactor-emotion">
+                    <img src={gratitude} alt="" className="tactor-emotion"/>
+                    <h4 className="text-center tactor-emotion">Gratitude</h4>
                     </div>
-                    <div class="col col-6 tactor-emotion">
-                      <img src={sadness} alt="" class="tactor-emotion"/>
-                      <h4 class="text-center tactor-emotion">Sadness</h4>
+                    <div className="col col-6 tactor-emotion">
+                      <img src={sadness} alt="" className="tactor-emotion"/>
+                      <h4 className="text-center tactor-emotion">Sadness</h4>
                     </div>
                   </div>)}
                     {this.state.shake1[0] &&(
-                      <div class="row tactor-emotion d-flex justify-items-center">
-                            <div class="col col-6 tactor-emotion">
-                            <img src={happiness} alt="" class="tactor-emotion"/>
-                            <h4 class="text-center tactor-emotion">Happiness</h4>
+                      <div className="row tactor-emotion d-flex justify-items-center">
+                            <div className="col col-6 tactor-emotion">
+                            <img src={happiness} alt="" className="tactor-emotion"/>
+                            <h4 className="text-center tactor-emotion">Happiness</h4>
                           </div>
-                              <div class="col col-6 tactor-emotion">
-                                <img src={gratitude} alt="" class="tactor-emotion"/>
-                                <h4 class="text-center tactor-emotion">Gratitude</h4>
+                              <div className="col col-6 tactor-emotion">
+                                <img src={gratitude} alt="" className="tactor-emotion"/>
+                                <h4 className="text-center tactor-emotion">Gratitude</h4>
                               </div>
-                              <div class="w-100"></div>
-                              <div class="col col-6 tactor-emotion">
-                              <img src={love} alt="" class="tactor-emotion"/>
-                              <h4 class="text-center tactor-emotion">Love</h4>
+                              <div className="w-100"></div>
+                              <div className="col col-6 tactor-emotion">
+                              <img src={love} alt="" className="tactor-emotion"/>
+                              <h4 className="text-center tactor-emotion">Love</h4>
                               </div>
-                              <div class="col col-6 tactor-emotion">
-                                <img src={sadness} alt="" class="tactor-emotion"/>
-                                <h4 class="text-center tactor-emotion">Sadness</h4>
+                              <div className="col col-6 tactor-emotion">
+                                <img src={sadness} alt="" className="tactor-emotion"/>
+                                <h4 className="text-center tactor-emotion">Sadness</h4>
                               </div>
-                              <div class="w-100"></div>
-                              <div class="col col-6 tactor-emotion">
-                              <img src={sympathy} alt="" class="tactor-emotion"/>
-                              <h4 class="text-center tactor-emotion">Sympathy</h4>
+                              <div className="w-100"></div>
+                              <div className="col col-6 tactor-emotion">
+                              <img src={sympathy} alt="" className="tactor-emotion"/>
+                              <h4 className="text-center tactor-emotion">Sympathy</h4>
                               </div>
                               </div>
                             )}
                             {this.state.rub1[0] &&(
-                              <div class="row tactor-emotion d-flex justify-items-center">
-                              <div class="col col-7 tactor-emotion mx-auto">
-                              <img src={love} alt="" class="tactor-emotion"/>
-                              <h4 class="text-center tactor-emotion">Love</h4>
+                              <div className="row tactor-emotion d-flex justify-items-center">
+                              <div className="col col-7 tactor-emotion mx-auto">
+                              <img src={love} alt="" className="tactor-emotion"/>
+                              <h4 className="text-center tactor-emotion">Love</h4>
                             </div>
-                            <div class="w-100"></div>
-                            <div class="col col-7 tactor-emotion mx-auto">
-                            <img src={sympathy} alt="" class="tactor-emotion"/>
-                            <h4 class="text-center tactor-emotion">Sympathy</h4>
+                            <div className="w-100"></div>
+                            <div className="col col-7 tactor-emotion mx-auto">
+                            <img src={sympathy} alt="" className="tactor-emotion"/>
+                            <h4 className="text-center tactor-emotion">Sympathy</h4>
                           </div>
                           </div>
                       )}  {this.state.push1[0] &&(
-                        <div class="row tactor-emotion d-flex justify-items-center">
-                          <div class="col col-7 tactor-emotion mx-auto">
-                          <img src={disgust} alt="" class="tactor-emotion"/>
-                          <h4 class="text-center tactor-emotion">Disgust</h4>
+                        <div className="row tactor-emotion d-flex justify-items-center">
+                          <div className="col col-7 tactor-emotion mx-auto">
+                          <img src={disgust} alt="" className="tactor-emotion"/>
+                          <h4 className="text-center tactor-emotion">Disgust</h4>
                         </div>
-                        <div class="w-100"></div>
-                        <div class="col col-7 tactor-emotion mx-auto">
-                        <img src={anger} alt="" class="tactor-emotion"/>
-                        <h4 class="text-center tactor-emotion">Anger</h4>
+                        <div className="w-100"></div>
+                        <div className="col col-7 tactor-emotion mx-auto">
+                        <img src={anger} alt="" className="tactor-emotion"/>
+                        <h4 className="text-center tactor-emotion">Anger</h4>
                       </div>
-                      <div class="w-100"></div>
-                      <div class="col col-7 tactor-emotion mx-auto">
-                      <img src={sadness} alt="" class="tactor-emotion"/>
-                      <h4 class="text-center tactor-emotion">Sadness</h4>
+                      <div className="w-100"></div>
+                      <div className="col col-7 tactor-emotion mx-auto">
+                      <img src={sadness} alt="" className="tactor-emotion"/>
+                      <h4 className="text-center tactor-emotion">Sadness</h4>
                     </div>
                     </div>
                   )}
                   {this.state.pat1[0] &&(
-                    <div class="row tactor-emotion d-flex justify-items-center">
-                          <div class="col col-6 tactor-emotion">
-                          <img src={sympathy} alt="" class="tactor-emotion"/>
-                          <h4 class="text-center tactor-emotion">Sympathy</h4>
+                    <div className="row tactor-emotion d-flex justify-items-center">
+                          <div className="col col-6 tactor-emotion">
+                          <img src={sympathy} alt="" className="tactor-emotion"/>
+                          <h4 className="text-center tactor-emotion">Sympathy</h4>
                         </div>
-                            <div class="col col-6 tactor-emotion">
-                              <img src={love} alt="" class="tactor-emotion"/>
-                              <h4 class="text-center tactor-emotion">Love</h4>
+                            <div className="col col-6 tactor-emotion">
+                              <img src={love} alt="" className="tactor-emotion"/>
+                              <h4 className="text-center tactor-emotion">Love</h4>
                             </div>
-                            <div class="w-100"></div>
-                            <div class="col col-6 tactor-emotion">
-                            <img src={gratitude} alt="" class="tactor-emotion"/>
-                            <h4 class="text-center tactor-emotion">Gratitude</h4>
+                            <div className="w-100"></div>
+                            <div className="col col-6 tactor-emotion">
+                            <img src={gratitude} alt="" className="tactor-emotion"/>
+                            <h4 className="text-center tactor-emotion">Gratitude</h4>
                             </div>
 
-                            <div class="col col-6 tactor-emotion">
-                              <img src={sadness} alt="" class="tactor-emotion "/>
-                              <h4 class="text-center tactor-emotion">Sadness</h4>
+                            <div className="col col-6 tactor-emotion">
+                              <img src={sadness} alt="" className="tactor-emotion "/>
+                              <h4 className="text-center tactor-emotion">Sadness</h4>
                             </div>
                           </div>)}
 
 
                   </div>
-                  <h4 class="text-center  mx-auto">Associated Emotion</h4>
+                  <h4 className="text-center  mx-auto">Associated Emotion</h4>
                 </div>
               </div>
             </section>
-            <div class="row buttons">
-              <div class="col col-3 tactorinfonav d-flex align-content-end tactselected">
-                <div class="row flex-nowrap">
-                  <div class="col">
-                    <div class="tactoricon d-flex justify-content-start">
-                      <img src={this.state.acttact[0]} alt="" class="tactorinfoicon"/>
+            
+            <div className="row buttons">
+              <div className="col col-3 tactorinfonav d-flex align-content-end tactselected">
+                <div className="row flex-nowrap">
+                  <div className="col">
+                    <div className="tactoricon d-flex justify-content-start">
+                      <img src={this.state.acttact[0]} alt="" className="tactorinfoicon"/>
                     </div>
                   </div>
-                  <div class="col tactinfo">
-              <h4 class="tactinfo">{this.state.acttact[3]}</h4>
+                  <div className="col tactinfo">
+              <h4 className="tactinfo">{this.state.acttact[3]}</h4>
             <br/>
-              <h5 class="tactinfo">{this.state.acttact[1]}</h5><img src={link} alt="" class="tactinfo"/><h5 class="tactinfo"> {this.state.acttact[2]}</h5>
+              <h5 className="tactinfo">{this.state.acttact[1]}</h5><img src={link} alt="" className="tactinfo"/><h5 className="tactinfo"> {this.state.acttact[2]}</h5>
             </div>
 
             </div>
           </div>
-              <div class="col float-right activated d-flex align-items-end justify-content-end">
-              <h4 class="activated">Please make sure you have activated the tactor.</h4>
-              <button class="align-items-center" id="activated"  onClick={() => this.activate(this.state.acttact[3])}>
-              <h6 class="text-center activated">Activate</h6>
-            </button>
+              <div className="col float-right activated d-flex align-items-end justify-content-end">
+
+              <h4 className="activated">Please make sure you have activated the tactor.</h4>
+              
+              {this.isActive(this.state.acttact[3])?
+                (<button className="align-items-center" id="deactivated"  onClick={() => this.deactivate(this.state.acttact[3])}>
+                  <h6 className="text-center deactivated">Deactivate</h6>
+                </button>) : 
+                (<button className="align-items-center" id="activated"  onClick={() => this.activate(this.state.acttact[3])}>
+                  <h6 className="text-center activated">Activate</h6>
+                </button>)}
 
             </div>
           </div>
@@ -1118,7 +1698,7 @@ pp(play){
                         <li className={"left-nav nav-link "+ this.state.bstate}  >
                           <a className="left-nav nav-link" onClick={() => this.handleClick("behavior")}>
                             <img src={behavior} alt="" className="left-nav icon"/>
-                            Behavior
+                            Touch
                           </a>
                         </li>
                       </ul>
@@ -1128,9 +1708,6 @@ pp(play){
 
 
               </div>
-
-
-
 
               {this.state.home && (
 
@@ -1366,8 +1943,6 @@ pp(play){
                           </div>
                     </div>
 
-
-
                     </div>
                     <div className="col">
                       <div className="bg-light  dashboard-box">
@@ -1388,25 +1963,22 @@ pp(play){
                                 let touchInverval =this.state.tint[0];
                                 let intervalRandomness = this.state.irand[0];
                                 let amplitude = 8;
-                                    if(!this.from){
-                                      if (this.count <= touchRange){
-                                        this.angle = this.count + p5.random(touchRandomness);
-                                        this.timer = p5.millis();
+                                
+                                if(!this.from){
+                                  if (this.count <= touchRange){
+                                    this.angle = this.count + p5.random(touchRandomness);
+                                    this.timer = p5.millis();
+                                  } else {
 
-                                      } else {
-
-                                        let delay = touchInverval + p5.random(intervalRandomness);
-                                        //let timer = millis();
-                                        if((p5.millis()-this.timer)>delay){
-                                          this.count = 0;
-                                          this.from = true;
-                                        }
-
-                                      }
-                                      this.count = this.count + speedOfTouching * 0.001*60;
+                                    let delay = touchInverval + p5.random(intervalRandomness);
+                                    //let timer = millis();
+                                    if((p5.millis()-this.timer)>delay){
+                                      this.count = 0;
+                                      this.from = true;
                                     }
-
-
+                                  }
+                                  this.count = this.count + speedOfTouching * 0.001*60;
+                                }
 
                                     if(this.from){
 
@@ -1493,32 +2065,218 @@ pp(play){
                       </div>
                       <div className="name-input">
                         <h6 className="name-label">Name</h6>
-                        <input type="text" className="text-input" value="Timeline Sample 1"/>
+                        <input type="text" className="text-input" value={this.state.fileName} onChange={this.handleChange}/>
                         <button className="archive float-right">
-                        <h6 className="archive slider-label" onClick={()=>alert("Archive is not yet an active feature. Stay Tuned!")}>Refer to Archive</h6>
-                        <img src={arrow} alt="" className="archive" onClick={()=>alert("Archive is not yet an active feature. Stay Tuned!")}/>
+                        <h6 className="archive slider-label" onClick={()=>this.handleClick("archive")}>Refer to Archive</h6>
+                        <img src={arrow} alt="" className="archive" onClick={()=>this.handleClick("archive")}/>
                       </button>
                       </div>
-                      <div className="buttons">
-                        <button className="float-right align-items-center" id="save" onClick={()=>alert("Archive is not yet an active feature. Stay Tuned!")}>
-                        <h6>Save</h6>
-                      </button>
-                        <button className="float-right align-items-center" id="export" onClick={()=>alert("Archive is not yet an active feature. Stay Tuned!")}>
-                        <h6>Export</h6>
-                      </button>
+                      <div className="buttons" id="archive-functions">
+                        
+                        <button className="float-right button-white" id="save" onClick={()=>this.handleClick("save2archive")}>
+                          <h6>Save</h6>
+                        </button>
+                        
+                        <button className="float-right button-black" id="export" onClick={()=>alert("Archive is not yet an active feature. Stay Tuned!")}>
+                          <h6>Export</h6>
+                        </button>
 
                       </div>
                     </div>
-
-
 
                   </div>
                   </section>
 
                 </div>
             )}
+
             </div>
             )}
+
+      {this.state.archive[0] && (
+        <div className="row left-nav group1">
+
+          <div className="col-2 bg-light sidebar d-flex tinfo">
+            <div className ="row left-nav group1">
+              <div className="col-12 left-col">
+                <nav className="navbar left-nav navbar-expand navbar-light">
+                  <ul className="left-nav text-left tinfo">
+                    <li className={"left-nav tactorinfonav-archive nav-link col col-auto tactorlink nav-link " + (this.isActive("hit")?"activated":"not-activated")}>
+                    <div className="row flex-nowrap">
+                      <div className="col">
+                        <div className={"tactoricon d-flex justify-content-start"}>
+                          <img src={hit} alt="" className="tactorinfoicon"/>
+                        </div>
+                      </div>
+                      <div className="col tactinfo">
+                        <h4 className="tactinfo">Hit</h4>
+                        <br/>
+                        <h5 className="tactinfo">Tactor 1</h5><img src={link} alt="" className="tactinfo"/><h5 className="tactinfo"> Pin 1</h5>
+                      </div>
+                    </div>
+                    </li>
+                    <li className={"left-nav tactorinfonav-archive nav-link col col-auto tactorlink nav-link " + (this.isActive("pat")?"activated":"not-activated")}>
+                      <div className="row flex-nowrap">
+                        <div className="col">
+                          <div className="tactoricon d-flex justify-content-start">
+                            <img src={pat} alt="" className="tactorinfoicon"/>
+                          </div>
+                        </div>
+                        <div className="col tactinfo">
+                          <h4 className="tactinfo">Pat</h4>
+                          <br/>
+                          <h5 className="tactinfo">Tactor 2</h5><img src={link} alt="" className="tactinfo"/><h5 className="tactinfo"> Pin 2</h5>
+                        </div>
+                      </div>
+                    </li>
+                    <li className={"left-nav tactorinfonav-archive nav-link col col-auto tactorlink nav-link " + (this.isActive("push")?"activated":"not-activated")}>
+                      <div className="row flex-nowrap">
+                        <div className="col">
+                          <div className={"tactoricon d-flex justify-content-start "}>
+                            <img src={push} alt="" className="tactorinfoicon"/>
+                          </div>
+                        </div>
+                        <div className="col tactinfo">
+                          <h4 className="tactinfo">Push</h4>
+                          <br/>
+                          <h5 className="tactinfo">Tactor 3</h5><img src={link} alt="" className="tactinfo"/><h5 className="tactinfo"> Pin 3</h5>
+                        </div>
+                      </div>
+                    </li>
+                    <li className={"left-nav tactorinfonav-archive nav-link col col-auto tactorlink nav-link " + (this.isActive("rub")?"activated":"not-activated")}>
+                      <div className="row flex-nowrap">
+                        <div className="col">
+                          <div className="tactoricon d-flex justify-content-start ">
+                            <img src={rub} alt="" className="tactorinfoicon"/>
+                          </div>
+                        </div>
+                        <div className="col tactinfo">
+                          <h4 className="tactinfo">Rub</h4>
+                          <br/>
+                          <h5 className="tactinfo">Tactor 4</h5><img src={link} alt="" className="tactinfo"/><h5 className="tactinfo"> Pin 4</h5>
+                        </div>
+                      </div>
+                    </li>
+                    <li className={"left-nav tactorinfonav-archive nav-link col col-auto tactorlink nav-link " + (this.isActive("shake")?"activated":"not-activated")}>
+                      <div className="row flex-nowrap">
+                        <div className="col">
+                          <div className="tactoricon d-flex justify-content-start ">
+                            <img src={shake} alt="" className="tactorinfoicon"/>
+                          </div>
+                        </div>
+                        <div className="col tactinfo">
+                          <h4 className="tactinfo">Shake</h4>
+                          <br/>
+                          <h5 className="tactinfo">Tactor 5</h5><img src={link} alt="" className="tactinfo"/><h5 className="tactinfo"> Pin 5</h5>
+                        </div>
+                      </div>
+                    </li>
+                    <li className={"left-nav tactorinfonav-archive nav-link col col-auto tactorlink nav-link " + (this.isActive("squeeze")?"activated":"not-activated")}>
+                      <div className="row flex-nowrap">
+                        <div className="col">
+                          <div className="tactoricon d-flex justify-content-start ">
+                            <img src={squeeze} alt="" className="tactorinfoicon"/>
+                          </div>
+                        </div>
+                        <div className="col tactinfo">
+                          <h4 className="tactinfo">Squeeze</h4>
+                          <br/>
+                          <h5 className="tactinfo">Tactor 6</h5><img src={link} alt="" className="tactinfo"/><h5 className="tactinfo"> Pin 6</h5>
+                        </div>
+                      </div>
+                    </li>
+                    <li className={"left-nav tactorinfonav-archive nav-link col col-auto tactorlink nav-link " + (this.isActive("stroke")?"activated":"not-activated")}>
+                      <div className="row flex-nowrap">
+                        <div className="col">
+                          <div className="tactoricon d-flex justify-content-start ">
+                            <img src={stroke} alt="" className="tactorinfoicon"/>
+                          </div>
+                        </div>
+                        <div className="col tactinfo">
+                          <h4 className="tactinfo">Stroke</h4>
+                          <br/>
+                          <h5 className="tactinfo">Tactor 7</h5><img src={link} alt="" className="tactinfo"/><h5 className="tactinfo"> Pin 7</h5>
+                        </div>
+                      </div>
+                    </li>
+                    <li className={"left-nav tactorinfonav-archive nav-link col col-auto tactorlink nav-link " + (this.isActive("tap")?"activated":"not-activated")}>
+                      <div className="row flex-nowrap">
+                        <div className="col">
+                          <div className="tactoricon d-flex justify-content-start">
+                            <img src={tap} alt="" className="tactorinfoicon"/>
+                          </div>
+                        </div>
+                        <div className="col tactinfo">
+                          <h4 className="tactinfo">Tap</h4>
+                          <br/>
+                          <h5 className="tactinfo">Tactor 8</h5><img src={link} alt="" className="tactinfo"/><h5 className="tactinfo"> Pin 8</h5>
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+        
+          <div className="col-10 main-content">
+            <section className="main-head">
+              <h2>Archive</h2>
+            </section>
+
+            <section className="archive-block">
+              <div className="header">
+                <h3>My Touches</h3>
+              </div>
+
+              <div className="data-block">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Emotion</th>
+                      <th>Tactor</th>
+                      <th>Date</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                    <tbody>
+                      {this.state.archiveData.map((item, i) => (
+                          <tr key={item.id}>
+                            <td onClick={() => this.setFromArchive(item)}>{item.name}</td>
+                            <td onClick={() => this.setFromArchive(item)}>{item.emotion}</td>
+                            <td onClick={() => this.setFromArchive(item)}>{item.tactor}</td>
+                            <td onClick={() => this.setFromArchive(item)}>{item.timestamp}</td>
+                            <td><img src={play} alt="" className="play-button"/></td>
+                          </tr>
+                        ))
+                      }
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="row footer">
+                <div className="col note">
+                  Please make sure you have activated the tactor before previewing the touch sensation
+                </div>
+
+                <div className="col">
+                  
+                </div>
+
+                <div className="col button-group">
+                  <button className="float-right align-items-center button-black" id="export-archive" onClick={() => alert("Feature not active.")}>
+                    <h6>Export</h6>
+                  </button>
+                </div>
+
+              </div>
+            </section>
+              
+          </div>
+        
+        </div>
+      )}
 
 </main>
 

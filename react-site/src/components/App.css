@@ -131,7 +131,6 @@ a.tactorlink{
 .left-nav.nav-link{
   color: #9C9C9C;
   cursor: pointer;
-
 }
 
 .left-nav .nav-link .active{
@@ -304,31 +303,47 @@ margin-bottom: 0rem;
 
 .buttons button{
   border: 1px solid #3A3A3A;
-border-radius: 20px;
-width: 6rem;
-margin: .3rem;
+  border-radius: 20px;
+  width: 6rem;
+  margin: .3rem;
 }
 
 .buttons{
   margin-top:3rem;
 }
 
-#export{
+.button-white{
   background: #FFFFFF;
+  color: #3A3A3A;
   text-transform: uppercase;
 }
 
-#save{
+.button-black{
   background: #3A3A3A;
   color: #FFFFFF;
   text-transform: uppercase;
 }
 
 #activated{
+  float: right;
+  width: 20%;
   background: #3A3A3A;
+  border: .1rem solid #3A3A3A;
   color: #FFFFFF;
   text-transform: uppercase;
-  padding: .5rem 6rem .5rem 1rem !important;
+  padding: .3rem .3rem !important;
+  align-items: center !important;
+}
+
+#deactivated{
+  float: right;
+  width: 20%;
+  background: #F5F5F5;
+  border: .1rem solid #3A3A3A;
+  color: #3A3A3A;
+  text-transform: uppercase;
+  padding: .3rem .3rem !important;
+  align-items: center !important;
 }
 
 input[type=range] {
@@ -557,8 +572,18 @@ h4.activated{
 }
 
 div.buttons{
-  margin-right:6rem!important;
-  margin-left: 3rem!important;
+  margin-right:2rem !important;
+  margin-left: 2rem !important;
+}
+
+#archive-functions{
+  width: 100%;
+  float: right;
+  margin-right: 0rem !important;
+}
+
+#archive-functions button{
+  margin-left: 0.75rem !important;
 }
 
 .generator-logo{
@@ -577,16 +602,138 @@ ul.left-nav.tinfo{
   padding-top:4rem !important;
 }
 
+ul.left-nav.archive{
+  margin-left:-20px !important;
+}
+
+.sidebar.archive{
+  padding-top:4rem !important;
+}
+
 
 img.tactortop, img.tactorside, img.tactorplacement{
   width:100%;
 }
 
-h6.activated{
-  margin:auto !important;
-
-}
-
 .tactselected{
   max-width:220px !important;
+}
+
+.tactorinfonav-archive{
+  width:80%;
+  padding-left:0;
+  margin-left: 3.8rem;
+  margin-bottom: .8rem;
+  border-radius: 1rem;
+  cursor: default !important;
+}
+
+.tactorinfonav-archive.activated{
+  border: 2px solid #F4B321;
+  background-color: #F4B321;
+}
+
+.tactorinfonav-archive.not-activated{
+  border: 0px solid #CACACA;
+}
+
+/* .tactorinfonav-archive .tactoricon.active{
+  border: 2px solid #F4B321;
+  border-radius: 1rem;
+}
+
+.tactorinfonav-archive .tactoricon.not-active{
+  background-color: none;
+  border-radius: 0rem;
+} */
+
+.archive-block{
+  background: #F5F5F5;
+  border: 1px solid #CACACA;
+  box-sizing: border-box;
+  border-radius: 20px;
+  height: 80%;
+  margin-top: 1.69rem;
+}
+
+.archive-block .header{
+  margin-left: 2.13rem;
+  margin-top: 1.75rem;
+}
+
+.archive-block .header h3{
+  line-height: 19px;
+  font-weight: 500 !important;
+  color: #3A3A3A;
+}
+
+.archive-block .data-block{
+  height: 70%;
+  margin-left: 1.75rem;
+  margin-right: 1.75rem;
+  margin-top: 3%;
+  background: #FFFFFF;
+  border: 1px solid #CACACA;
+}
+
+.archive-block .data-block table{
+  width: 100%;
+}
+
+.archive-block .data-block table thead tr th{
+  padding: 8px;
+  background-color: #3A3A3A;
+  color: #FFFFFF;
+}
+
+.archive-block .data-block table tbody tr{
+  border-bottom: 2px solid #F5F5F5;
+  cursor: pointer !important;
+}
+
+.archive-block .data-block table tbody tr td{
+  padding: 8px;
+}
+
+.archive-block .data-block table tbody tr:nth-child(even){
+  background-color: #F5F5F5;
+}
+
+.archive-block .data-block table tbody tr:hover{
+  background-color: #F4B321;
+  color: #3A3A3A;
+}
+
+.archive-block .footer{
+  margin-top: 1.75rem;
+  margin-left: 1.75rem;
+}
+
+.archive-block .footer .note{
+  margin-left: 0.5rem;
+
+  font-style: normal;
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 16px;
+  display: flex;
+  align-items: center;
+  text-align: left;
+
+  color: #3A3A3A;
+}
+
+.button-group{
+ margin-right: 1.75rem;
+}
+
+.button-group button{
+  border: 1px solid #3A3A3A;
+  border-radius: 20px;
+  width: 6rem;
+  margin: .3rem;
+}
+
+.play-button {
+  cursor: pointer !important;
 }
