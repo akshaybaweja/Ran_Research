@@ -1,4 +1,4 @@
- import React from 'react';
+import React from 'react';
 import './App.css';
 import emotion from "./Icons/Small Icons/mood-24px-grey.svg";
 import tactor from "./Icons/Small Icons/tactor-grey.svg";
@@ -28,6 +28,8 @@ import tint from "./Icons/Small Icons/touch_interval.svg";
 import irand from "./Icons/Small Icons/interval_randomness.svg";
 import play from "./Icons/play-filled.svg";
 import pause from "./Icons/pause-filled.svg";
+import del from "./Icons/delete.svg";
+import info from "./Icons/info.svg";
 import arrow from "./Icons/Small Icons/arrow.svg";
 import hitw from "./Icons/Tactor_white/Gesture_white_Hit.svg";
 import patw from "./Icons/Tactor_white/Gesture_white_Pat-14.svg";
@@ -37,7 +39,7 @@ import shakew from "./Icons/Tactor_white/Gesture_white_Shake.svg";
 import squeezew from "./Icons/Tactor_white/Gesture_white_Squeeze-15.svg";
 import strokew from "./Icons/Tactor_white/Gesture_white_Stroke.svg";
 import tapw from "./Icons/Tactor_white/Gesture_white_Tap-17.svg";
-import link from "./Icons/link.svg"
+import link from "./Icons/link.svg";
 import patup from "./Icons/Tactor Image/Pat/yellow_pat_up.png";
 import patcut from "./Icons/Tactor Image/Pat/yellow_pat_cut.png";
 import pushup from "./Icons/Tactor Image/Push/yellow_push_up.png";
@@ -89,6 +91,14 @@ serialmsg = [0, 12, 12, 90, 25, 150, 0, 50, 0];
 
 constructor(props) {
   super(props);
+  
+  let foundUser = 'default';
+  let loggedInUser = localStorage.getItem("username");
+  if (loggedInUser) {
+    foundUser = loggedInUser
+    this.setState({username: foundUser});
+  }
+
   this.state = {
     home: true,
     emotion: false,
@@ -142,7 +152,7 @@ constructor(props) {
     love: null,
     gratitude: null,
     archiveData: [],
-    username: "akshaybaweja",
+    username: foundUser,
     fileName: "Timeline Sample 1",
   };
   this.handleChange = this.handleChange.bind(this);
@@ -176,21 +186,28 @@ writer.releaseLock();
 };
 
 async start(data) {
-  if (this.state.port==null){
-  toast("This app is requesting to use your serial port, are you alright with this action?")
-  this.port =  await navigator.serial.requestPort();
-  const ports = await navigator.serial.getPorts();
+  if (this.state.port == null) {
+    if (window.confirm("This app is requesting to use your serial port.\nAre you alright with this action?")) {
+      this.port = await navigator.serial.requestPort();
+      const ports = await navigator.serial.getPorts();
 
-  if(this.port.readable===null){
-  await this.port.open({ baudRate: 9600 });
-}
-  console.log(this.port);
-  console.log(ports);
-  this.setState({port:true,});
+      if (this.port.readable === null) {
+        await this.port.open({
+          baudRate: 9600
+        });
+      }
+      console.log(this.port);
+      console.log(ports);
+      this.setState({
+        port: true,
+      });
 
+    }
+    console.log(this.state.port);
+    this.write(this.port, data);
+  } else {
+    toast("Action Suspended");
   }
-  console.log(this.state.port);
-  this.write(this.port, data);
 };
 
 handleClick(name) {
@@ -431,8 +448,28 @@ handleClick(name) {
 
     fetch('https://akshaybaweja.com/ran/api.php/archive/' + this.state.username, requestOptions)
       .then(response => response.json())
-      .then(data => data.response==="success"?toast("Saved Successfully"):toast("Error while saving"))
+      .then(data => data.response==="success"?toast("Saved Successfully ✅"):toast("❌ Error while saving"))
       .then(() => this.getArchiveData());
+    break;
+    case "login": 
+    let name = window.prompt("Enter your username", "default");
+
+    fetch('https://akshaybaweja.com/ran/api.php/user/' + name, requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        if (data.response !== "success") {
+          name = 'default';
+          toast("Inavlid Username");
+        }
+
+        this.setState({
+          username: name
+        }, () => {
+          toast(({ closeToast }) => <div>Username set to [<b>{this.state.username}</b>]</div>);
+          localStorage.setItem("username", this.state.username);
+          this.getArchiveData();
+        });
+      });
     break;
     default: console.log("handleClick: defaultState");
   }
@@ -1203,16 +1240,16 @@ switch (name) {
 
 }
 
-pp(play){
-  if(this.state.tselected){
-  if(play){
-    this.serialmsg[8]=0;
-  }else{
-    this.serialmsg[8]=1;
-  }
-  console.log(this.serialmsg);
-  this.start(this.serialmsg);
-}else{
+pp(play) {
+  if (this.state.tselected) {
+    if (play) {
+      this.serialmsg[8] = 0;
+    } else {
+      this.serialmsg[8] = 1;
+    }
+    console.log(this.serialmsg);
+    this.start(this.serialmsg);
+  } else {
     toast("Tactor not selected, you must select a tactor before uploading tactor behavior.");
   }
 
@@ -1220,7 +1257,7 @@ pp(play){
 }
 
 componentDidMount(){
-  this.getArchiveData();
+    this.getArchiveData();
 }
 
 getArchiveData(){
@@ -1277,11 +1314,15 @@ setFromArchive(item){
     });
   }
 
-  if (window.confirm("The required tactor is not activated.\nDo you want to activate it now?")) {
-    this.handleClick("tinfo");
-    this.handleClick(item.tactor.toLowerCase() + '1');
-  } else {
+  if (this.isActive(item.tactor)) {
     routine();
+  } else {
+    if (window.confirm("The required tactor is not activated.\nDo you want to activate it now?")) {
+      this.handleClick("tinfo");
+      this.handleClick(item.tactor.toLowerCase() + '1');
+    } else {
+      routine();
+    }
   }
 }
 
@@ -1310,7 +1351,7 @@ render(){
       </div>
   </nav>
 
-<section className="page-content">
+    <section className="page-content">
         <main role="main page">
 
       {this.state.tinfo[0] &&(
@@ -2080,7 +2121,7 @@ render(){
                           <h6>Save</h6>
                         </button>
                         
-                        <button className="float-right button-black" id="export" onClick={()=>toast("Archive is not yet an active feature. Stay Tuned!")}>
+                        <button className="float-right button-black" id="export" onClick={()=>toast("Feature not active")}>
                           <h6>Export</h6>
                         </button>
 
@@ -2228,8 +2269,19 @@ render(){
             </section>
 
             <section className="archive-block">
-              <div className="header">
-                <h3>My Touches</h3>
+              <div className="header row">
+                <div className="title col">My Touches</div>
+
+                <div className="col">
+
+                </div>
+
+                <div className="col">
+
+
+                </div>
+
+                <div className="col username">{this.state.username} <img src={info} alt="" className="img-button" onClick={() => this.handleClick("login")}/></div>
               </div>
 
               <div className="data-block">
@@ -2241,6 +2293,7 @@ render(){
                       <th>Tactor</th>
                       <th>Date</th>
                       <th></th>
+                      <th></th>
                     </tr>
                   </thead>
                     <tbody>
@@ -2249,8 +2302,9 @@ render(){
                             <td onClick={() => this.setFromArchive(item)}>{item.name}</td>
                             <td onClick={() => this.setFromArchive(item)}>{item.emotion}</td>
                             <td onClick={() => this.setFromArchive(item)}>{item.tactor}</td>
-                            <td onClick={() => this.setFromArchive(item)}>{item.timestamp}</td>
-                            <td><img src={play} alt="" className="play-button"/></td>
+                            <td onClick={() => this.setFromArchive(item)}>{new Date(item.timestamp+" UTC").toLocaleString("en-US", {dateStyle: "medium", timeStyle: "short"})}</td>
+                            <td><img src={play} alt="" className="img-button" onClick={() => toast("Feature not active.")}/></td>
+                            <td><img src={del} alt="" className="img-button" onClick={() => toast("Feature not active.")}/></td>
                           </tr>
                         ))
                       }
@@ -2293,7 +2347,7 @@ newestOnTop
 closeOnClick
 rtl={false}
 pauseOnFocusLoss
-draggable
+draggable={false}
 pauseOnHover
 />
 </div>
