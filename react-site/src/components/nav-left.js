@@ -29,7 +29,11 @@ import irand from "./Icons/Small Icons/interval_randomness.svg";
 import play from "./Icons/play-filled.svg";
 import pause from "./Icons/pause-filled.svg";
 import del from "./Icons/delete.svg";
-import info from "./Icons/info.svg";
+import edit from "./Icons/edit.svg";
+import pauseOutline from "./Icons/pause-unfilled.svg";
+import playOutline from "./Icons/play-unfilled.svg";
+import download from "./Icons/download.svg";
+import settings from "./Icons/settings.svg";
 import arrow from "./Icons/Small Icons/arrow.svg";
 import hitw from "./Icons/Tactor_white/Gesture_white_Hit.svg";
 import patw from "./Icons/Tactor_white/Gesture_white_Pat-14.svg";
@@ -62,6 +66,11 @@ import shakeplace from "./Icons/Placement Image/Shake_placement-16.png";
 import squeezeplace from "./Icons/Placement Image/Squeeze_placement-17.png";
 import strokeplace from "./Icons/Placement Image/Stroke_placement-18.png";
 import tapplace from "./Icons/Placement Image/Tap_placement-19.png";
+import homeconnect from "./Icons/Small Icons/home_connect-24px-grey.svg";
+import serialconnect from "./Icons/Small Icons/serial_connect-24px-grey.svg";
+import tactorconnect from "./Icons/Small Icons/tactor_connect-24px-grey.svg";
+import homeconnect_pc from "./Icons/Connection/home_connect_pc.svg";
+import homeconnect_power from "./Icons/Connection/home_connect_power.svg";
 
 import Emotion from './emotion';
 import Sketch from 'react-p5';
@@ -69,7 +78,7 @@ import Sketch from 'react-p5';
 import { ToastContainer, toast, Slide } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 
-// const SerialPort = require('serialport');
+var serialPort = require("browser-serialport");
 // const port = new SerialPort('/dev/tty-usbserial1');
 
 //TO DO: Add the emotion and placeholders to the left bar.
@@ -127,9 +136,17 @@ constructor(props) {
     rub: null,
     stroke: null,
     tap: null,
+    chome: true,
+    homeconnect: true,
+    hcstate: "active",
+    serialconnect: false,
+    scstate: null,
+    tactorconnect: false,
+    tcstate: null,
     port:null,
     generator:[true,"active"],
     tinfo:[false, null],
+    connection: [false, null],
     archive:[false,null],
     shake1:[false,null,false,"Tactor 5", "Pin 5"], //selected, "active", activated
     squeeze1:[false,null,false, "Tactor 6", "Pin 6"],
@@ -168,21 +185,20 @@ async write(port, slider){
   //parseInt(slider);
   var data = new Uint8Array(9);
   for(var i=0;i<slider.length;i++){
-  data[i] = parseInt(slider[i]);
-}
-  //
+    data[i] = parseInt(slider[i]);
+  }
 
   // console.log(port.writable);
   await writer.write(data);
   console.log(data);
-//
-//   const textEncoder = new TextEncoder();
-// const writableStreamClosed = textEncoder.readable.pipeTo(port.writable);
-//
-// const writer = textEncoder.writable.getWriter();
+ 
+  //   const textEncoder = new TextEncoder();
+  // const writableStreamClosed = textEncoder.readable.pipeTo(port.writable);
 
-// await writer.write("hello");
-writer.releaseLock();
+  // const writer = textEncoder.writable.getWriter();
+
+  // await writer.write("hello");
+  writer.releaseLock();
 };
 
 async start(data) {
@@ -225,7 +241,7 @@ handleClick(name) {
       //alert(localStorage.getItem('test'));
       break;
     case "tactor":
-      this.setState({home: false, emotion: false, estate:null, tactor: true, tstate:"active", behavior: false, bstate: null});
+      this.setState({ home: false, emotion: false, estate:null, tactor: true, tstate:"active", behavior: false, bstate: null});
       break;
     case "emotionselect":
       if(this.state.tselected){
@@ -247,16 +263,31 @@ handleClick(name) {
     case "tbots":
     this.setState({home:true, emotion: false,  tactor:false, behavior:false});
     break;
+    // conneection tab pages
+    case "homeConnect": 
+    this.setState({ homeconnect:true, hcstate:"active", serialconnect: false, scstate:null, tactorconnect: false, tcstate:null});
+    break;
+    case "serialConnect": 
+    this.setState({ homeconnect:false, hcstate:null, serialconnect: true, scstate:"active", tactorconnect: false, tcstate:null});
+    break;
+    case "tactorConnect": 
+    this.setState({ homeconnect:false, hcstate:null, serialconnect: false, scstate:null, tactorconnect: true, tcstate:"active"});
+    break;
+    // Topbar Page Tabs
     case "tgen":
-    this.setState({generator:[true,"active"], tinfo:[false,null], archive:[false,null]});
+    this.setState({generator:[true,"active"], tinfo:[false,null], connection:[false, null], archive:[false,null]});
     break;
     case "tinfo":
-    this.setState({generator:[false,null], tinfo:[true,"active"], archive:[false,null]});
+    this.setState({generator:[false,null], tinfo:[true,"active"], connection:[false, null], archive:[false,null]});
+    break;
+    case "connection":
+    this.setState({generator:[false,null], tinfo:[false, null], connection:[true,"active"], archive:[false,null]});
     break;
     case "archive":
-    this.setState({generator:[false,null], tinfo:[false,null], archive:[true,"active"]});
+    this.setState({generator:[false,null], tinfo:[false,null], connection:[false, null], archive:[true,"active"]});
     // alert("Archive is not yet an active feature. Stay Tuned!");
     break;
+    // Emotions
     case "hit":
     if(hitstate[2]){
       if(this.state.eselected){
@@ -270,7 +301,7 @@ handleClick(name) {
     }else{
       toast("You need to activate this tactor before continuing.");
 
-      this.setState({generator:[false,null], tinfo:[true,"active"], archive:[false,null]});
+      this.setState({generator:[false,null], tinfo:[true,"active"], connection:[false, null], archive:[false,null]});
       this.setState({place:hitplace,cut:patcut,up:patup,acttact:[hit,hitstate[3],hitstate[4], "Hit"],hit1:[true,"active",hitstate[2],hitstate[3],hitstate[4]], pat1:[false,null,patstate[2],patstate[3],patstate[4]], push1:[false,null,pushstate[2],pushstate[3],pushstate[4]], rub1:[false,null,rubstate[2],rubstate[3],rubstate[4]],shake1:[false,null,shakestate[2],shakestate[3],shakestate[4]],squeeze1:[false,null,squeezestate[2],squeezestate[3],squeezestate[4]],stroke1:[false,null,strokestate[2],strokestate[3],strokestate[4]],tap1:[false,null,tapstate[2],tapstate[3],tapstate[4]],});
 
     }
@@ -288,7 +319,7 @@ handleClick(name) {
     }else{
       toast("You need to activate this tactor before continuing.");
 
-      this.setState({generator:[false,null], tinfo:[true,"active"], archive:[false,null]});
+      this.setState({generator:[false,null], tinfo:[true,"active"], connection:[false, null], archive:[false,null]});
       this.setState({place:patplace,cut:patcut,up:patup,acttact:[pat,patstate[3],patstate[4], "Pat"],hit1:[false,null,hitstate[2],hitstate[3],hitstate[4]], pat1:[true,"active",patstate[2],patstate[3],patstate[4]], push1:[false,null,pushstate[2],pushstate[3], pushstate[4]], rub1:[false,null,rubstate[2],rubstate[3],rubstate[4]],shake1:[false,null,shakestate[2],shakestate[3],shakestate[4]],squeeze1:[false,null,squeezestate[2],squeezestate[3],squeezestate[4]],stroke1:[false,null,strokestate[2],strokestate[3],strokestate[4]],tap1:[false,null,tapstate[2],tapstate[3],tapstate[4]],});
     }
     break;
@@ -305,7 +336,7 @@ handleClick(name) {
     }else{
       toast("You need to activate this tactor before continuing.");
 
-      this.setState({generator:[false,null], tinfo:[true,"active"], archive:[false,null]});
+      this.setState({generator:[false,null], tinfo:[true,"active"], connection:[false, null], archive:[false,null]});
       this.setState({place:pushplace,cut:pushcut,up:pushup,acttact:[push,pushstate[3],pushstate[4], "Push"],hit1:[false,null,hitstate[2],hitstate[3],hitstate[4]], pat1:[false,null,patstate[2],patstate[3],patstate[4]], push1:[true,"active",pushstate[2],pushstate[3],pushstate[4]], rub1:[false,null,rubstate[2],rubstate[3],rubstate[4]],shake1:[false,null,shakestate[2],shakestate[3],shakestate[4]],squeeze1:[false,null,squeezestate[2],squeezestate[3],squeezestate[4]],stroke1:[false,null,strokestate[2],strokestate[3],strokestate[4]],tap1:[false,null,tapstate[2],tapstate[3],tapstate[4]],});
 
     }
@@ -323,7 +354,7 @@ handleClick(name) {
     }else{
       toast("You need to activate this tactor before continuing.");
 
-      this.setState({generator:[false,null], tinfo:[true,"active"], archive:[false,null]});
+      this.setState({generator:[false,null], tinfo:[true,"active"], connection:[false, null], archive:[false,null]});
       this.setState({place:rubplace,cut:rubcut,up:rubup,acttact:[rub,rubstate[3],rubstate[4], "Rub"],hit1:[false,null,hitstate[2],hitstate[3],hitstate[4]], pat1:[false,null,patstate[2],patstate[3],patstate[4]], push1:[false,null,pushstate[2],pushstate[3],pushstate[4]], rub1:[true,"active",rubstate[2],rubstate[3],rubstate[4]],shake1:[false,null,shakestate[2],shakestate[3],shakestate[4]],squeeze1:[false,null,squeezestate[2],squeezestate[3],squeezestate[4]],stroke1:[false,null,strokestate[2],strokestate[3],strokestate[4]],tap1:[false,null,tapstate[2],tapstate[3],tapstate[4]],});
 
     }
@@ -342,7 +373,7 @@ handleClick(name) {
     }else{
       toast("You need to activate this tactor before continuing.");
 
-      this.setState({generator:[false,null], tinfo:[true,"active"], archive:[false,null]});
+      this.setState({generator:[false,null], tinfo:[true,"active"], connection:[false, null], archive:[false,null]});
       this.setState({place:shakeplace,cut:shakecut,up:shakeup,acttact:[shake,shakestate[3],shakestate[4], "Shake"],hit1:[false,null,hitstate[2],hitstate[3],hitstate[4]], pat1:[false,null,patstate[2],patstate[3],patstate[4]], push1:[false,null,shakestate[2],shakestate[3],shakestate[4]], rub1:[false,null,rubstate[2],rubstate[3],rubstate[4]],shake1:[true,"active",shakestate[2],shakestate[3],shakestate[4]],squeeze1:[false,null,squeezestate[2],squeezestate[3],squeezestate[4]],stroke1:[false,null,strokestate[2],strokestate[3],strokestate[4]],tap1:[false,null,tapstate[2],tapstate[3],tapstate[4]],});
 
     }
@@ -360,7 +391,7 @@ handleClick(name) {
       break;
     }else{
       toast("You need to activate this tactor before continuing.");
-      this.setState({generator:[false,null], tinfo:[true,"active"], archive:[false,null]});
+      this.setState({generator:[false,null], tinfo:[true,"active"], connection:[false, null], archive:[false,null]});
       this.setState({place:squeezeplace,cut:squeezecut,up:squeezeup,acttact:[squeeze,squeezestate[3],squeezestate[4], "Squeeze"],hit1:[false,null,hitstate[2],hitstate[3],hitstate[4]], pat1:[false,null,patstate[2],patstate[3],patstate[4]], push1:[false,null,pushstate[2],pushstate[3],pushstate[4]], rub1:[false,null,rubstate[2],rubstate[3],rubstate[4]],shake1:[false,null,shakestate[2],shakestate[3],shakestate[4]],squeeze1:[true,"active",squeezestate[2],squeezestate[3],squeezestate[4]],stroke1:[false,null,strokestate[2],strokestate[3],strokestate[4]],tap1:[false,null,tapstate[2],tapstate[3],tapstate[4]],});
 
     }
@@ -378,7 +409,7 @@ handleClick(name) {
       break;
     }else{
       toast("You need to activate this tactor before continuing.");
-      this.setState({generator:[false,null], tinfo:[true,"active"], archive:[false,null]});
+      this.setState({generator:[false,null], tinfo:[true,"active"], connection:[false, null], archive:[false,null]});
       this.setState({place:strokeplace,cut:strokecut,up:strokeup,acttact:[stroke,strokestate[3],strokestate[4], "Stroke"],hit1:[false,null,hitstate[2],hitstate[3],hitstate[4]], pat1:[false,null,patstate[2],patstate[3],patstate[4]], push1:[false,null,pushstate[2],pushstate[3],pushstate[4]], rub1:[false,null,rubstate[2],rubstate[3],rubstate[4]],shake1:[false,null,shakestate[2],shakestate[3],shakestate[4]],squeeze1:[false,null,squeezestate[2],squeezestate[3],squeezestate[4]],stroke1:[true,"active",strokestate[2],strokestate[3],strokestate[4]],tap1:[false,null,tapstate[2],tapstate[3],tapstate[4]],});
 
     }
@@ -396,12 +427,13 @@ handleClick(name) {
       break;
     }else{
       toast("You need to activate this tactor before continuing.");
-      this.setState({generator:[false,null], tinfo:[true,"active"], archive:[false,null]});
+      this.setState({generator:[false,null], tinfo:[true,"active"], connection:[false, null], archive:[false,null]});
       this.setState({place:tapplace,cut:tapcut,up:tapup,acttact:[tap,tapstate[3],tapstate[4],"Tap"],hit1:[false,null,hitstate[2],hitstate[3],hitstate[4]], pat1:[false,null,patstate[2],patstate[3],patstate[4]], push1:[false,null,pushstate[2],pushstate[3],pushstate[4]], rub1:[false,null,rubstate[2],rubstate[3],rubstate[4]],shake1:[false,null,shakestate[2],shakestate[3],shakestate[4]],squeeze1:[false,null,squeezestate[2],squeezestate[3],squeezestate[4]],stroke1:[false,null,strokestate[2],strokestate[3],strokestate[4]],tap1:[true,"active",tapstate[2],tapstate[3],tapstate[4]],});
 
     }
 
     break;
+    // Emotions Storage
     case "hit1":
     this.setState({place:hitplace,cut:patcut,up:patup,acttact:[hit,hitstate[3],hitstate[4], "Hit"],hit1:[true,"active",hitstate[2],hitstate[3],hitstate[4]], pat1:[false,null,patstate[2],patstate[3],patstate[4]], push1:[false,null,pushstate[2],pushstate[3],pushstate[4]], rub1:[false,null,rubstate[2],rubstate[3],rubstate[4]],shake1:[false,null,shakestate[2],shakestate[3],shakestate[4]],squeeze1:[false,null,squeezestate[2],squeezestate[3],squeezestate[4]],stroke1:[false,null,strokestate[2],strokestate[3],strokestate[4]],tap1:[false,null,tapstate[2],tapstate[3],tapstate[4]],});
     break;
@@ -426,6 +458,7 @@ handleClick(name) {
     case "tap1":
     this.setState({place:tapplace,cut:tapcut,up:tapup,acttact:[tap,tapstate[3],tapstate[4],"Tap"],hit1:[false,null,hitstate[2],hitstate[3],hitstate[4]], pat1:[false,null,patstate[2],patstate[3],patstate[4]], push1:[false,null,pushstate[2],pushstate[3],pushstate[4]], rub1:[false,null,rubstate[2],rubstate[3],rubstate[4]],shake1:[false,null,shakestate[2],shakestate[3],shakestate[4]],squeeze1:[false,null,squeezestate[2],squeezestate[3],squeezestate[4]],stroke1:[false,null,strokestate[2],strokestate[3],strokestate[4]],tap1:[true,"active",tapstate[2],tapstate[3],tapstate[4]],});
     break;
+    // Archive Function
     case "save2archive":
 
     var formdata = new FormData();
@@ -451,28 +484,38 @@ handleClick(name) {
       .then(data => data.response==="success"?toast("Saved Successfully ✅"):toast("❌ Error while saving"))
       .then(() => this.getArchiveData());
     break;
+    // Login Function
     case "login": 
     let name = window.prompt("Enter your username", "default");
+    if(name !== null) {
+      console.log(name);
+      fetch('https://akshaybaweja.com/ran/api.php/user/' + name, requestOptions)
+        .then(response => response.json())
+        .then(data => {
+          if (data.response !== "success") {
+            name = 'default';
+            toast("Inavlid Username");
+          }
 
-    fetch('https://akshaybaweja.com/ran/api.php/user/' + name, requestOptions)
-      .then(response => response.json())
-      .then(data => {
-        if (data.response !== "success") {
-          name = 'default';
-          toast("Inavlid Username");
-        }
-
-        this.setState({
-          username: name
-        }, () => {
-          toast(({ closeToast }) => <div>Username set to [<b>{this.state.username}</b>]</div>);
-          localStorage.setItem("username", this.state.username);
-          this.getArchiveData();
+          this.setState({
+            username: name
+          }, () => {
+            toast(({ closeToast }) => <div>Username set to [<b>{this.state.username}</b>]</div>);
+            localStorage.setItem("username", this.state.username);
+            this.getArchiveData();
+          });
         });
-      });
+    }
     break;
     default: console.log("handleClick: defaultState");
   }
+}
+
+async getSerialPorts(){
+  serialPort.list((err, ports) => {
+    console.log(err);
+    console.log(ports);
+  })
 }
 
 isActive(name) {
@@ -1272,8 +1315,22 @@ getArchiveData(){
   });
 }
 
-setFromArchive(item){
+deleteFromArchive(item){
+  if(window.confirm('Are you sure you want to delete - ' + item.name + '?')){
+    return fetch('https://akshaybaweja.com/ran/api.php/archive/'+this.state.username+'/'+item.id+'/delete')
+    .then(response => response.json())
+    .then(data => {
+      if(data.response === "success"){
+        toast(({ closeToast }) => <div>Deleted [<b>{item.name}</b>]</div>);
+        this.getArchiveData();
+      } else {
+        toast(({ closeToast }) => <div>ERROR: Couldn't delete [<b>{item.name}</b>]</div>);
+      }
+    })
+  }
+}
 
+setFromArchive(item){
   let routine = () => {
     this.emotionSelect(item.emotion.toLowerCase(), () => {
       this.tactorSelect(item.tactor.toLowerCase(), this.state.ename, () => {
@@ -1343,13 +1400,16 @@ render(){
           <li className={"top-nav nav-item active text-center "+ this.state.tinfo[1]}>
             <a className={"top-nav nav-link " + this.state.tinfo[1]}   onClick={() => this.handleClick("tinfo")}>Tactor Information{this.state.tinfo[0]&&(<span className="sr-only">(current)</span>)}</a>
           </li>
+          <li className={"top-nav nav-item active text-center "+ this.state.connection[1]}>
+            <a className={"top-nav nav-link " + this.state.connection[1]}   onClick={() => this.handleClick("connection")}>Connection{this.state.connection[0]&&(<span className="sr-only">(current)</span>)}</a>
+          </li>
           <li className={"top-nav nav-item active text-center "+ this.state.archive[1]}>
             <a className={"top-nav nav-link " + this.state.archive[1]}    onClick={() => this.handleClick("archive")}>Archive{this.state.archive[0]&&(<span className="sr-only">(current)</span>)}</a>
           </li>
         </ul>
-
+        <div className="username">{this.state.username} <img src={edit} alt="" className="img-button" onClick={() => this.handleClick("login")}/></div>
       </div>
-  </nav>
+    </nav>
 
     <section className="page-content">
         <main role="main page">
@@ -2135,7 +2195,114 @@ render(){
             )}
 
             </div>
+      )}
+
+      {this.state.connection[0] && (
+        <div className ="row left-nav group1 dflex flex-nowrap">
+              <div className="col col-2 bg-light  sidebar d-flex">
+                <div className ="row left-nav group1">
+                  <div className="col-12 left-col">
+                    <nav className="navbar left-nav navbar-expand navbar-light">
+                      <ul className="left-nav nav-item text-left">
+                        <li className={"left-nav nav-link " + this.state.hcstate}    onClick={() => this.handleClick("homeConnect")}>
+                          <a className="left-nav nav-link">
+                            <img src={homeconnect} alt="" className="left-nav icon"/>
+                            Home Connection
+                          </a>
+                        </li>
+
+                        <li className={"left-nav nav-link " + this.state.scstate}   onClick={() => this.handleClick("serialConnect")}>
+                          <a className="left-nav nav-link" >
+                            <img src={serialconnect} alt="" className="left-nav icon"/>
+                            Serial Connection
+                          </a>
+                        </li>
+
+                        <li className={"left-nav nav-link "+ this.state.tcstate}  >
+                          <a className="left-nav nav-link" onClick={() => this.handleClick("tactorConnect")}>
+                            <img src={tactorconnect} alt="" className="left-nav icon"/>
+                            Tactor Connection
+                          </a>
+                        </li>
+                      </ul>
+                    </nav>
+                  </div>
+                </div>
+              </div>
+
+            {this.state.homeconnect && (
+              <div className="col-10 main-content">
+              <section className="main-head">
+                <h2>Home Connection</h2>
+                {console.log(this.getSerialPorts())}
+              </section>
+              <section className="home-connect-table">
+                <div className="row home-connect-row">
+                  <div className="col">
+                    <div className="col-header">
+                      <h3 className="home-connect">Step 1: Connect to PC</h3>
+                    </div>
+                    <div className={"bg-light home-connect-box home-connect d-flex align-items-center"}>
+                      <img src={homeconnect_pc} alt="" className="center-image"/>
+                    </div>
+                    <div className="col-footer">
+                      <h4 className="home-connect text-center">Connect the home module to the PC</h4>
+                    </div>
+                  </div>
+                  <div className="col">
+                    <div className="col-header">
+                      <h3 className="home-connect">Step 2: Connect to external power supply</h3>
+                    </div>
+                    <div className={"bg-light home-connect-box home-connect d-flex align-items-center "}>
+                      <img src={homeconnect_power} alt="" className="center-image"/>
+                    </div>
+                    <div className="col-footer">
+                      <h4 className="home-connect text-center">Connect the home device to the extra power<br/>(optional when running less then 4 tactors at a time) </h4>
+                    </div>
+                  </div>
+                </div>
+                <div className="row home-connect-row">
+                  <div className="col">
+                    <button className="align-items-center connection-button" onClick={() => this.handleClick("serialConnect")}>
+                        <h6 className="text-center">Next</h6>
+                    </button>
+                  </div>
+                </div>
+                
+              </section>
+            </div>
             )}
+
+            {this.state.serialconnect && (
+              <div className="col-10 main-content">
+                <section className="main-head">
+                  <h2>Serial Connection</h2>
+                </section>
+                <section>
+                  <h3 className="serial-connect">Select Serial Port</h3>
+                  <div className="serial-select">
+                    <select id="serial-port" className="serial-select">
+                      <option value="" disabled selected>Select Serial Port</option>
+                    </select>
+                  </div>
+                </section>
+              </div>
+            )}
+
+            {this.state.tactorconnect && (
+              <div className="col-10 main-content">
+                <section className="main-head">
+                  <h2>Tactor Connection</h2>
+                </section>
+                <section>
+                  
+                </section>
+
+              </div>
+            )}
+
+            </div>
+      )}
 
       {this.state.archive[0] && (
         <div className="row left-nav group1">
@@ -2280,8 +2447,6 @@ render(){
 
 
                 </div>
-
-                <div className="col username">{this.state.username} <img src={info} alt="" className="img-button" onClick={() => this.handleClick("login")}/></div>
               </div>
 
               <div className="data-block">
@@ -2294,17 +2459,21 @@ render(){
                       <th>Date</th>
                       <th></th>
                       <th></th>
+                      <th></th>
+                      <th></th>
                     </tr>
                   </thead>
                     <tbody>
                       {this.state.archiveData.map((item, i) => (
                           <tr key={item.id}>
-                            <td onClick={() => this.setFromArchive(item)}>{item.name}</td>
-                            <td onClick={() => this.setFromArchive(item)}>{item.emotion}</td>
-                            <td onClick={() => this.setFromArchive(item)}>{item.tactor}</td>
-                            <td onClick={() => this.setFromArchive(item)}>{new Date(item.timestamp+" UTC").toLocaleString("en-US", {dateStyle: "medium", timeStyle: "short"})}</td>
-                            <td><img src={play} alt="" className="img-button" onClick={() => toast("Feature not active.")}/></td>
-                            <td><img src={del} alt="" className="img-button" onClick={() => toast("Feature not active.")}/></td>
+                            <td>{item.name}</td>
+                            <td>{item.emotion}</td>
+                            <td>{item.tactor}</td>
+                            <td>{new Date(item.timestamp.split(" ").join("T")+"Z").toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'})}</td>
+                            <td><img src={playOutline} alt="" className="img-button" onClick={() => toast("Feature not active.")}/></td>
+                            <td><img src={settings} alt="" className="img-button" onClick={() => this.setFromArchive(item)}/></td>
+                            <td><img src={download} alt="" className="img-button" onClick={() => toast("Feature not active.")}/></td>
+                            <td><img src={del} alt="" className="img-button" onClick={() => this.deleteFromArchive(item)}/></td>
                           </tr>
                         ))
                       }
@@ -2312,22 +2481,7 @@ render(){
                 </table>
               </div>
 
-              <div className="row footer">
-                <div className="col note">
-                  Please make sure you have activated the tactor before previewing the touch sensation
-                </div>
-
-                <div className="col">
-                  
-                </div>
-
-                <div className="col button-group">
-                  <button className="float-right align-items-center button-black" id="export-archive" onClick={() => toast("Feature not active.")}>
-                    <h6>Export</h6>
-                  </button>
-                </div>
-
-              </div>
+              {/* */}
             </section>
               
           </div>

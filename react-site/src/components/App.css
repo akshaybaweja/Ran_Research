@@ -1,11 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
 /* Top Navbar Styling */
 .navbar-brand{
   margin-left: 2rem;
-  font-family: "roboto";
-  font-size: 16px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 22px;
   color: #3A3A3A !important;
   font-weight: 700;
-
+  margin-top: 0;
 }
 
 .navbar{
@@ -13,15 +15,20 @@
 }
 
 .top-nav .navbar-nav{
-  font-size: 14px;
-  font-family:"Roboto";
+  font-size: 16px;
+  font-family: 'Roboto', sans-serif;
   margin-top:-0.12rem;
   padding-top: 0rem;
   padding-bottom: 1rem;
 }
+
 .top-nav .nav-item{
   margin-right: 5rem;
   margin-bottom: -2.2rem;
+}
+
+.top-nav .nav-item:last-child{
+  margin-right: 0;
 }
 
 .top-nav.nav-link{
@@ -180,6 +187,11 @@ a.tactorlink{
   margin: 0rem !important;
 }
 
+h4.home-connect {
+  margin: 0rem !important;
+  max-width: 100rem !important;
+}
+
 .graph{
   margin: 1rem 1rem 2rem 1rem;
 }
@@ -226,6 +238,131 @@ section .emotion-table{
   margin-top: 2rem;
 }
 
+.row .home-connect-row{
+  height: 100% !important;
+  width: 100% !important;
+}
+
+.home-connect-row > .col {
+  width: auto;
+  padding: 1.8rem .1rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  margin-left: .5rem;
+  margin-right: .5rem;
+}
+
+.center-image {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+section .home-connect-table{
+  margin-left: 0rem !important;
+}
+
+.home-connect-box{
+  border-radius: 1rem;
+  border: 1px solid #3A3A3A !important;
+  background: white !important;
+  width: 100% !important;
+  height:100% !important;
+  padding:0rem 2rem;
+  margin-bottom: .8rem;
+  margin-top: 2rem;
+}
+
+.connection-button {
+  float: right;
+  width: 8rem;
+  background: #3A3A3A;
+  border: .1rem solid #3A3A3A;
+  border-radius: 1.5rem;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  margin-top: 3rem;
+  padding: .3rem .3rem !important;
+  align-items: center !important;
+}
+
+h3.serial-connect{
+  margin-top: 5rem;
+  margin-bottom: 2rem;
+}
+
+.serial-select select{
+  /* A reset of styles, including removing the default dropdown arrow */
+  appearance: none;
+  /* Additional resets for further consistency */
+  background-color: transparent;
+  border: none;
+  padding: 0 1em 0 0;
+  margin: 0;
+  width: 100%;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: inherit;
+  line-height: inherit;
+
+  outline: none;
+}
+
+.serial-select select::-ms-expand {
+  display: none;
+}
+
+:root {
+  --select-border: #CACACA;
+  --select-arrow: var(--select-border);
+}
+
+.serial-select{
+  width: 100%;
+  min-width: 15ch;
+  border: 1px solid var(--select-border);
+  border-radius: 2em;
+  padding-left: 1.25em;
+
+  font-size: 1rem;
+  cursor: pointer;
+  line-height: 2.5;
+  background-color: #F0F0F0;
+  display: grid;
+  grid-template-areas: "select";
+  align-items: center;
+  position: relative;
+  color: #9C9C9C;
+}
+
+.serial-select::after {
+  content: "";
+  width: 0.8em;
+  height: 0.52em;
+  margin-right: 1.5rem;
+  background-color: var(--select-arrow);
+
+  clip-path: polygon(100% 0%, 0 0%, 50% 100%);
+  justify-self: end;
+}
+
+.serial-select select, .serial-select::after {
+  grid-area: select;
+}
+
+.highlite{
+  background-color: #CACACA;
+  border-radius: .5rem;
+  font-weight: bold;
+  padding: .15rem .35rem;
+  color:#3A3A3A;
+}
+
+.connect-bottom-row{
+  
+}
+
 .suggested{
   border-radius: 1rem;
   border: 5px solid #F4B321;
@@ -242,7 +379,7 @@ section .emotion-table{
 .slider-value, .slider-label{
   display: inline-block;
   font-weight:400;
-  font-family: Roboto;
+  font-family: 'Roboto', sans-serif;
   font-size: 14px;
   margin-bottom: 0rem;
 }
@@ -275,7 +412,7 @@ section .emotion-table{
   display:inline-block !important;
   display: inline-block;
 font-weight: 400;
-font-family: Roboto;
+font-family: 'Roboto', sans-serif;
 font-size: 14px;
 margin-bottom: 0rem;
 }
@@ -408,20 +545,20 @@ border-radius: 10px;
 }
 
 h2 {
-  font-family: "Roboto" !important;
+  font-family: 'Roboto', sans-serif !important;
   font-size:30px !important;
   font-weight: 500 !important;
   line-height: 3.8rem !important;
 }
 
 h3{
-  font-family: "Roboto" !important;
+  font-family: 'Roboto', sans-serif !important;
   font-size: 18px !important;
   font-weight: 400 !important;
 }
 
 h4{
-  font-family: "Roboto" !important;
+  font-family: 'Roboto', sans-serif !important;
   font-size: 14px !important;
   font-weight: 400 !important;
   margin:1rem;
@@ -430,7 +567,7 @@ h4{
 }
 
 h5{
-  font-family: "Roboto" !important;
+  font-family: 'Roboto', sans-serif !important;
   font-size: 11px !important;
   font-weight: 400 !important;
 }
@@ -665,7 +802,7 @@ img.tactortop, img.tactorside, img.tactorplacement{
 .archive-block .header .title{
   line-height: 19px;
   padding-left: 0;
-  font-family: "Roboto" !important;
+  font-family: 'Roboto', sans-serif !important;
   font-size: 20px !important;
   font-weight: 500 !important;
 
@@ -673,11 +810,14 @@ img.tactortop, img.tactorside, img.tactorplacement{
   float: left !important;
 }
 
-.archive-block .header .username{
+.username{
   line-height: 19px;
   padding-right: 0;
+  padding-left: 0;
+  margin-left: 0;
+  margin-right: 0;
   text-align: right;
-  font-family: "Roboto" !important;
+  font-family: 'Roboto', sans-serif !important;
   font-size: 16px !important;
   font-weight: 500 !important;
 
@@ -686,7 +826,8 @@ img.tactortop, img.tactorside, img.tactorplacement{
 }
 
 .archive-block .data-block{
-  height: 70%;
+  height: inherit;
+  margin-bottom: 1.75rem;
   margin-left: 1.75rem;
   margin-right: 1.75rem;
   margin-top: 3%;
