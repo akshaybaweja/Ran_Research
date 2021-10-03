@@ -263,12 +263,18 @@ handleClick(name) {
     case "tbots":
     this.setState({home:true, emotion: false,  tactor:false, behavior:false});
     break;
-    // conneection tab pages
+    // connection tab pages
     case "homeConnect": 
     this.setState({ homeconnect:true, hcstate:"active", serialconnect: false, scstate:null, tactorconnect: false, tcstate:null});
     break;
     case "serialConnect": 
     this.setState({ homeconnect:false, hcstate:null, serialconnect: true, scstate:"active", tactorconnect: false, tcstate:null});
+    break;
+    case "selectPort":
+      // open SerialPort pop-up
+      this.start("<RAN>");
+      console.log("<RAN>");
+      console.log(this.state.port == null ? "PORT OPEN":"PORT CLOSED");
     break;
     case "tactorConnect": 
     this.setState({ homeconnect:false, hcstate:null, serialconnect: false, scstate:null, tactorconnect: true, tcstate:"active"});
@@ -2281,7 +2287,7 @@ render(){
                 <section>
                   <h3 className="serial-connect">Select Serial Port</h3>
                   <div className="serial-select">
-                    <select id="serial-port" className="serial-select">
+                    <select id="serial-port" className="serial-select" onClick={this.handleClick("selectPort")}>
                       <option value="" disabled selected>Select Serial Port</option>
                     </select>
                   </div>
